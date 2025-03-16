@@ -6,8 +6,17 @@
 }
 
 .prose {
-  /* Disable automaticaly adding backticks to inline code */
-  code::after, code::before {
-    content: unset;
+  /* lighten the code text a bit to match because we adjusted the font-size */
+  --tw-prose-code: var(--color-gray-700);
+
+  code {
+    /* Override the code that sets the code font size smaller because it makes
+     * things look missaligned */
+    font-size: inherit;
+
+    /* Disable automaticaly adding backticks to inline code */
+    &::after, &::before {
+      content: unset;
+    }
   }
 }
