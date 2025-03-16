@@ -27,7 +27,10 @@ const Entry: React.FC<{ entry: TocEntry }> = ({ entry }) => {
   );
 };
 
-const TableOfContents: React.FC<{ className?: string, entries: Toc }> = ({ className, entries }) => {
+const TableOfContents: React.FC<{ className?: string; entries: Toc }> = ({
+  className,
+  entries
+}) => {
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
       <h3>Contents</h3>
