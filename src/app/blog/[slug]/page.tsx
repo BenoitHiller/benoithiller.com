@@ -9,7 +9,7 @@ type Props = {
   params: Promise<Params>;
 };
 
-const dynamicParams = false;
+export const dynamicParams = false;
 
 async function generateStaticParams() {
   const blogPath = process.env.blogPath;
@@ -47,5 +47,5 @@ async function Page({ params }: Props) {
   );
 }
 
-export { dynamicParams, generateStaticParams, generateMetadata };
+export { generateStaticParams, generateMetadata };
 export default Page;
