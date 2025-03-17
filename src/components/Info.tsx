@@ -31,7 +31,7 @@ const Info: React.FC<{ children: React.ReactNode; type?: BoxKind }> = ({
 }) => {
   const { containerClass } = BOX_TYPES[type];
   return (
-    <div className={`pt-2 px-4 pb-6 rounded-md ${containerClass}`}>
+    <div className={`my-4 pt-2 px-4 pb-6 rounded-md ${containerClass}`}>
       <InfoBoxHeader type={type} />
       <div className="infobox-content">{children}</div>
     </div>
