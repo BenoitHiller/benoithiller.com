@@ -1,0 +1,336 @@
+import { Info, Note, Warning } from '@/components/Info';
+export const title = "MSBuild Variable Expansion";
+
+The official documentation is a bit sparse in terms the syntax and semantics of variable expansion within MSBuild files, so I want to try and build out some more complete technical documentation for my own reference.
+
+MSBuild has 3 types of variable expansion expressions
+
+1. Metadata `%( ... )`
+2. Property `$( ... )`
+3. Item `@( ... )`
+
+They each have slightly different syntax so we will go through them individually and present a rough [ABNF](https://datatracker.ietf.org/doc/html/rfc5234) grammar for them which I have reverse-engineered from the code in [Expander.cs](https://github.com/dotnet/msbuild/blob/main/src/Build/Evaluation/Expander.cs) (as retrieved on 2025-03-11, at commit `af0a20f3`).
+
+The grammars presented below all omit whitespace in an effort to make things easier to read. Whitespace is generally allowed between any two tokens.
+
+The shared `SCREAMING_SNAKE_CASE` rules are included in the [Shared Grammar Rules](#shared-grammar-rules) section at the end. Note that `ARGUMENTS` is included at the end because it is reused everywhere, but it is incredibly complex compared to all of the other rules in that section.
+
+<Note>
+  I'm leaning towards a less strict representation of the parse, focusing on how it happens with respect to the Expander code spliting up the input. This means that there will be cases where input is rejected by later parsing steps.
+
+  An example of this is the registry property expansions. The Expander just grabs everything within the delimiters for the registry path, but when that is actually processed the code fetching registry values will further parse that to determine if it is a valid registry path.
+</Note>
+
+---
+
+## Metadata Expansion
+```ruby
+metadata_expansion = "%(" [ IDENTIFIER "." ] IDENTIFIER ")"
+```
+
+A metadata expansion only has two simple forms
+
+1. `%(MetadataName)`
+2. `%(ItemType.MetadataName)`
+
+The `MetadataName` specifies which metadata field to look up. `ItemType` specifies on what items to look up that field.
+
+The `ItemType` can only be omitted when the expression appears in a context that is operating on a specific set of items already, so that it can be assumed that set is what you are fetching metadata from.
+
+---
+
+## Property Expansion
+```ruby
+indexer = "[" [ ARGUMENTS ] "]"
+method_call = "." IDENTIFIER [ "(" [ ARGUMENTS ] ")" ]
+
+registry_lookup = "Registry:" REGISTRY_PATH [ "@" REGISTRY_KEY ]
+static_method = "[" TYPE_NAME "]::" IDENTIFIER [ "(" [ ARGUMENTS ] ")" ]
+
+remainder = *( indexer / method_call )
+
+property_expansion_body = IDENTIFIER remainder
+property_expansion_body =/ static_method remainder
+property_expansion_body =/ registry_lookup
+
+property_expansion = "$(" [ property_expansion_body ] ")"
+```
+
+A property expansion has 3 forms
+
+1. Simple properties `$(PropertyName)`
+2. Static method invocations e.g. `$([ClassName]::MethodName("argument"))`
+3. Registry properties e.g. `$(Registry:Path@Location)`
+
+### Simple Properties
+
+```powershell
+$(PropertyName)
+$(PropertyName[3])
+$(PropertyName.Replace('from', 'to'))
+$(PropertyName.Replace('from', 'to')[0].RotateLeft(1))
+```
+
+These are the simple case where you provide the name of a property to retrieve its value.
+
+A property name may be followed by any number of indexers (e.g. `[index]`) or method invocations (e.g. `.method(argument)`) that operate on the value read from the property.
+
+### Static Method Invocations
+
+```powershell
+$([System.Guid]::NewGuid())
+$([MSBuild]::Add($(NumberOne), $(NumberTwo)))
+$([System.String]::New('string').Replace('s', 'S'))
+```
+
+You are able to invoke a static method on a class available to the MSBuild runtime by specifying a full class name and the method to invoke.
+
+As with simple properties property any number of indexers or method invocations may be chained afterwards.
+
+### Registry Lookups
+
+```powershell
+$(Registry:HKEY_LOCAL_MACHINE\Software\Microsoft\.NETFramework)
+$(REGISTRY:HKEY_LOCAL_MACHINE\Software\Vendor\Tools@TaskLocation)
+```
+
+Registry lookups simply retrieve the registry value at the specified path and location.
+
+The location is delimited with an `@` symbol. The location can also be omitted in which case the value at the default location for that path will be retrieved.
+
+Registry lookups cannot have methods or indexers chained after them.
+
+<Info>
+  As you can see in the above examples the word `Registry` is not case sensitive. ABNF made the wacky choice of case insensitive by default and this is the only place it matters here.
+</Info>
+
+### Indexers
+
+Both simple properties and static method invocations can be followed by any number of method calls or indexers.
+
+An indexer is simply a shorthand for calling the appropriate method to index into a value. So depending on the type of the value being indexed it will correspond to something different.
+
+* strings use `get_Chars` (meaning they use the indexer of the `Chars` property of a string)
+* Arrays use `GetValue`
+* everything else uses `get_Item` (which will correspond to the indexer of the `Item` property)
+
+Examples:
+
+```powershell
+$(PropertyName[3])
+#=> the 4th character of the value of PropertyName
+
+$([System.IO.Directory]::GetFiles(".")[0][1])
+#=> the 2nd character of the 1st file in the current directory
+```
+
+<Warning>
+  MSBuild doesn't do any special handling for things like range expressions. Thus `$(PropertyName[0..3])` will produce an error because it tried to pass in `"0...3"` as the index.
+</Warning>
+
+
+<Note>
+  The indexer arguments technically have a different matching behaviour from method arguments because. The indexer parsing code first scans for the matching `]` without the usual checks for matching quotes or parenthesis, then it scans for the arguments inside of that.
+
+  The implication of this is that `$(Example[']'])` gives you an error that the quotes don't match.
+
+  This also means that you can't use an indexer anywhere inside an indexer. So `$(Example1[$(Example2[0])])` will complain about mismatched parentheses.
+
+  The fact that the code does not handle quoted square brackets is very much a bug so encoding that behaviour into the grammar doesn't make much sense.
+</Note>
+
+### Methods
+
+A method call is just what it sounds like. You can specify a method and it will simply attempt to call the method by name on the specified object. A method invocation is specified by putting a `.` followed by the method name.
+
+Parenthesis may be placed after the method name to provide 0 or more comma separated arguments.
+
+Examples:
+
+```powershell
+$(PropertyName.Replace('from', 'to').Replace('to', 'from'))
+$(PropertyName.Length)
+$([System.DateTime]::Now.Year)
+$([System.DateTime]::Now.AddDays(100))
+```
+
+<Info>
+  If you omit the parenthesis on a method MSBuild will assume you mean a property or field and only attempt to invoke those.
+</Info>
+
+### Method Arguments
+
+The arguments passed to method invocations and indexers are parsed through the following steps:
+
+1. Split the content between the `()` or `[]` at commas unless the commas appear between matched quotes or parentheses.
+2. Trim whitespace from both ends of each argument.
+3. Remove matching pairs of quotes if they are the first and last characters of an argument.
+
+These rules have some significant quirks compared to how you might be used to arguments or strings being parsed in a programming language, so it is recommended that you be very careful about how you write your arguments.
+
+```powershell
+$([System.String]::New('part1,''part2,'))
+#=> part1,''part2,
+
+$([System.String]::New('part1,'"part2,"))
+#=> 'part1,'"part2,"
+
+$([System.String]::New(part1   part2))
+#=> part1   part2
+```
+
+After spitting the arguments, each has property expansion performed on it recursively.
+
+<Info>
+  All arguments are parsed as strings and then rely on the behaviour defined in `Type.DefaultBinder` to do some basic conversions when they are passed to a method using `Type.InvokeMember`.
+
+  As a result of these type conversions you will want to beware of potential ambiguity when a method has multiple implementations with the same number of arguments.
+</Info>
+
+---
+
+## Item Expansion
+
+```ruby
+item_function = IDENTIFIER "(" [ ARGUMENTS ] ")"
+transform = "->" ( SINGLE_QUOTED_STRING | item_function )
+
+item_expansion = "@("
+    IDENTIFIER *( transform ) [ "," SINGLE_QUOTED_STRING ]
+")"
+```
+
+An item expansion is, at least syntax-wise, much simpler than a property expansion. It only really has the one meaningful form composed of 3 parts:
+
+* The `ItemType` to use as input
+* A chain of 0 or more transforms
+* An optional separator string
+
+### Transforms
+
+Transforms take a set of items and modify it in some way to produce a new one. In most cases this means producing a new set of items where each Include value is mapped into a new one, with the metadata values for each item being copied over unchanged.
+
+The only exceptions to the above are that some of the intrinsic item functions which can do things like filtering the item set or instead producing output items where the Include value is unchanged but the metadata is updated.
+
+#### Item Function Transforms
+
+```powershell
+@(Items->get_Length()->Replace('1', '2'))
+@(Items->Count())
+@(Items->HasMetadata('MetadataName'))
+```
+
+Item functions are either methods/properties/fields of System.String or a list of what are called [intrinsic item functions](https://learn.microsoft.com/en-us/visualstudio/msbuild/item-functions#intrinsic-item-functions).
+
+There are some slight differences between the functions you can specify here and the methods that can be specified in a property expansion. One crucial difference is that you no longer have the ability to omit the parenthesis to specify a property/field.
+
+To specify that you wish to access a property you would instead specify a function prefixed with `get_`, e.g. accessing Length is done via `->get_Length()`.
+
+Also different from property expansion is that here each transform step is always producing a new set of items, even something like the intrinsic function `Count()` produces a single item whose `Include` value is the number of items that were in the input.
+
+<Note>
+  The implication of transforms always being from items to items is that no matter what steps you have in your chain of transforms the functions available are only the set mentioned at the beginning of this section. It doesn't matter what type the previous type returned.
+</Note>
+
+#### Quoted String Transforms
+
+```powershell
+@(Items->'%(MetadataName)')
+@(Items->HasMetadata('MetadataName')->'%(MetadataName): %(OtherMetadataName)')
+```
+
+If the transform is a single quoted string it has the effect of mapping the Include value of each item into that string. Then after that metadata expansion is performed within the resulting string in the context of the item being processed.
+
+The metadata expansion described here is the only case where expansion is done out of order. Expansion is normally performed in the order of metadata → property → item.
+
+There is special logic in the code to do metadata expansion which checks if the metadata is inside of a transform expression and if so it leaves it as is for the item expansion to handle.
+
+<Warning>
+  There is no such special handling of nested property expansions.
+
+  If there is a property expansion within a quoted string transform, then it is only run once before the item expansion is performed. That means that every item gets the exact same value for it. You can see this easily by calling a method which must always return a different value within the property expansion.
+
+  For example running the Print target of the following MSBuild file will output the same guid twice.
+
+  ```xml
+  <Project>
+    <ItemGroup>
+      <Items Include="test1;test2;" />
+    </ItemGroup>
+
+    <Target Name="Print">
+      <Message
+        Importance="High"
+        Text="@(Items->'$([System.Guid]::NewGuid())')"
+      />
+    </Target>
+  </Project>
+  ```
+
+  To work around this you will want to make use of [batching](https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-batching) to cause a target or task to be evaluated multiple times, thus performing the desired property expansion once per batch.
+</Warning>
+
+
+### Item Separator
+
+```powershell
+@(Items, ',')
+@(Items->Replace('a', 'b'), 'something weird')
+@(Items->'%(MetadataName)', '---')
+```
+
+If an item separator is specified at the end of the item expansion instead of outputing a new set of items, the expansion will produce the final Include values joined together by the specified separator.
+
+This output is literally just a string so it doesn’t preserve any metadata.
+
+---
+
+## Shared Grammar Rules
+
+The rules `ALPHA` and `DIGIT` are defined in [Appendix B](https://datatracker.ietf.org/doc/html/rfc5234#appendix-B) of the ABNF spec for general use in grammars.
+
+### Negated Character Groups
+
+Unfortunately ABNF, like EBNF, doesn't handle unicode well so to represent the flexibility of some of these rules I'm going to have to give up and add a simple extension to the ABNF syntax to have negated character groups.
+
+The definition of this extension below makes use of the rules defined in [Section 4 of RFC5234](https://datatracker.ietf.org/doc/html/rfc5234#section-4).
+
+```ruby
+any-character = num-val / char-val
+negated-character-group =
+    "!(" *c-wsp any-character *c-wsp *( "/" *c-wsp any-character ) *c-wsp ")"
+```
+
+This enables you to write `!( "'" )` to mean any character except for a single quote.
+
+### The Rules Themselves
+
+```ruby
+IDENTIFIER = ALPHA / "_" *( ALPHA / DIGIT / "_" / "-")
+SINGLE_QUOTED_STRING = "'" *( !("'") ) "'"
+
+TYPE_NAME = *( !("]") )
+REGISTRY_PATH = *( !("@") )
+REGISTRY_LOCATION = ANY_SEQUENCE
+
+ARGUMENTS = ARGUMENT *( "," ARGUMENT )
+```
+
+The above rules also require a few supplemental rules that do not appear elsewhere.
+
+```ruby
+DOUBLE_QUOTED_STRING = %x22 *( !(%x22) ) %x22
+BACKTICK_STRING = "`" *( !("`") ) "`"
+QUOTED_STRING = SINGLE_QUOTED_STRING / DOUBLE_QUOTED_STRING / BACKTICK_STRING
+
+NOT_QUOTE_OR_PAREN = !( "'" / %x22 / "`" / "(" / ")" )
+MATCHING_PARENS_SEGMENT =
+    "(" *( QUOTED_STRING / MATCHING_PARENS_SEGMENT / *NOT_QUOTE_OR_PAREN ) ")"
+
+ANY_SEQUENCE = MATCHING_PARENS_SEGMENT / QUOTED_STRING / NOT_QUOTE_OR_PAREN
+
+ARGUMENT_NON_SPECIAL = !( "'" / %x22 / "`" / "(" / ")" / "," )
+ARGUMENT = *(
+    QUOTED_STRING / "$" MATCHING_PARENS_SEGMENT / ARGUMENT_NON_SPECIAL
+)
+```
