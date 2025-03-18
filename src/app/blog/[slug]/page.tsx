@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 
-import fs from 'fs/promises';
 import path from 'path';
 import TableOfContents from './TableOfContents';
 import Footer from './Footer';
+import * as TwoColumns from '@/components/TwoColumns';
+
+import * as blogDb from '@/data/blog';
 
 type Params = { slug: string };
 type Props = {
@@ -17,14 +19,14 @@ async function generateStaticParams() {
   if (!blogPath) {
     throw 'Please specify env.blogPath to build blog posts';
   }
-  const paths = await fs.readdir(blogPath);
+  const paths = await blogDb.listFiles();
 
   return paths.map((entry) => ({ slug: path.parse(entry).name }));
 }
 
 async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const { title } = await import(`@/blog/${slug}.mdx`);
+  const { title } = await blogDb.get(slug);
 
   return {
     title
@@ -33,22 +35,22 @@ async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 async function Page({ params }: Props) {
   const { slug } = await params;
-  const { default: Post, title, tableOfContents } = await import(`@/blog/${slug}.mdx`);
+  const { Component, title, tableOfContents } = await blogDb.get(slug);
 
   return (
-    <div className="flex gap-8 mx-6">
-      <section className="w-64 pt-6 justify-self-stretch max-lg:hidden border-r border-gray-950/5">
+    <TwoColumns.Layout>
+      <TwoColumns.Left className="w-64" hideable>
         <TableOfContents className="fixed" entries={tableOfContents} />
-      </section>
-      <article className="max-md:max-w-full pt-6">
+      </TwoColumns.Left>
+      <TwoColumns.Right Element="article">
         <div className="prose">
           <h1>{title}</h1>
-          <Post />
+          <Component />
           <hr className="mt-10 mb-8" />
         </div>
         <Footer />
-      </article>
-    </div>
+      </TwoColumns.Right>
+    </TwoColumns.Layout>
   );
 }
 
