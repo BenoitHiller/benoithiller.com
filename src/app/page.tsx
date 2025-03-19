@@ -13,11 +13,6 @@ async function Page() {
           I've selected a few samples of my recent work available on GitHub in the Portfolio
           section. You can find a link to my full profile below.
         </p>
-        <p>
-          The site itself is a bit simple because it is mostly an excuse to familiarize myself with
-          the more recent changes to Next.js. So it intentionally isn't using a pre-made template or
-          library for the site content.
-        </p>
         <dl>
           <dt className="inline">GitHub:</dt>
           <dd className="inline">
