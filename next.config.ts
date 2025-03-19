@@ -3,20 +3,33 @@ import type { NextConfig } from 'next';
 import createMDX from '@next/mdx';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: 'export',
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   env: {
     blogPath: path.resolve(__dirname, 'src/blog')
+  },
+  images: {
+    unoptimized: true
+  },
+  eslint: {
+    ignoreDuringBuilds: true
   }
 };
 
+const rehypePlugins = [
+  ['rehype-slug'],
+  ['@stefanprobst/rehype-extract-toc'],
+  ['@stefanprobst/rehype-extract-toc/mdx']
+];
+
 const withMDX = createMDX({
   options: {
-    rehypePlugins: [
-      ['rehype-slug'],
-      ['@stefanprobst/rehype-extract-toc'],
-      ['@stefanprobst/rehype-extract-toc/mdx']
-    ]
+    // createMDX doesn't seem to support the string plugin definitions in its
+    // types even though the underlying code does. For now I'm forcing a type
+    // match here to resolve the issue.
+    //
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rehypePlugins: rehypePlugins as any
   }
 });
 
