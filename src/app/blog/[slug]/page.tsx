@@ -35,7 +35,8 @@ async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 async function Page({ params }: Props) {
   const { slug } = await params;
-  const { Component, title, tableOfContents } = await blogDb.get(slug);
+  const post = await blogDb.get(slug);
+  const { Component, title, tableOfContents } = post;
 
   return (
     <TwoColumns.Layout>
@@ -48,7 +49,7 @@ async function Page({ params }: Props) {
           <Component />
           <hr className="mt-10 mb-8" />
         </div>
-        <Footer />
+        <Footer post={post} />
       </TwoColumns.Right>
     </TwoColumns.Layout>
   );

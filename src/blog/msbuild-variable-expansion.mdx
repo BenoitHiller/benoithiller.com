@@ -1,11 +1,14 @@
 import { Info, Note, Warning } from '@/components/Info';
 import { joined } from '@/stringUtils';
-export const title = "MSBuild Variable Expansion";
-export const description = joined`
+
+export const metadata = {
+  title: "MSBuild Variable Expansion",
+  description: joined`
   A supplement to the official MSBuild documentation where I provide
   detailed documentation of the syntax and semantics of variable expansion
-  expressions in MSBuild files.
-`;
+  expressions in MSBuild files.`,
+  publishedAt: new Date("2025-03-17T09:45:48-04:00")
+};
 
 The official documentation is a bit sparse in terms the syntax and semantics of variable expansion within MSBuild files, so I want to try and build out some more complete technical documentation for my own reference.
 

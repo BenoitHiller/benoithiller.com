@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
   output: 'export',
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   env: {
-    blogPath: path.resolve(__dirname, 'src/blog')
+    blogPath: path.resolve(__dirname, 'src/blog'),
+    rootPath: path.resolve(__dirname)
   },
   images: {
     unoptimized: true
