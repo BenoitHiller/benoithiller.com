@@ -7,7 +7,7 @@ const PostList = async () => {
   return (
     <div>
       {posts.map(({ title, slug, description }) => (
-        <Card key={slug} title={title} href={`/blog/${slug}`}>
+        <Card key={slug} title={title ?? slug} href={`/blog/${slug}`}>
           {description}
         </Card>
       ))}

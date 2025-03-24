@@ -15,10 +15,6 @@ type Props = {
 export const dynamicParams = false;
 
 async function generateStaticParams() {
-  const blogPath = process.env.blogPath;
-  if (!blogPath) {
-    throw 'Please specify env.blogPath to build blog posts';
-  }
   const paths = await blogDb.listFiles();
 
   return paths.map((entry) => ({ slug: path.parse(entry).name }));
@@ -45,7 +41,7 @@ async function Page({ params }: Props) {
       </TwoColumns.Left>
       <TwoColumns.Right Element="article">
         <div className="prose">
-          <h1>{title}</h1>
+          <h1>{title ?? slug}</h1>
           <Component />
           <hr className="mt-10 mb-8" />
         </div>
