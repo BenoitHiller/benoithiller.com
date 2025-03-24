@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import type { BlogPost } from '@/data/blog';
-import DateTime from '@/components/DateTime';
+import Timestamp from '@/components/Timestamp';
 
 // Don't show updates for the first hour because I'm putting in the published
 // at by hand.
@@ -28,7 +28,7 @@ const Footer: React.FC<{ post: BlogPost }> = ({ post: { publishedAt, updatedAt }
           <>
             <dt>Published At</dt>
             <dd>
-              <DateTime value={finalPublishedAt} />
+              <Timestamp value={finalPublishedAt} />
             </dd>
           </>
         )}
@@ -36,7 +36,7 @@ const Footer: React.FC<{ post: BlogPost }> = ({ post: { publishedAt, updatedAt }
           <>
             <dt>Updated At</dt>
             <dd>
-              <DateTime value={finalUpdatedAt} />
+              <Timestamp value={finalUpdatedAt} />
             </dd>
           </>
         )}
