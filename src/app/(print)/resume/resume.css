@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+
+@utility resume-section {
+  @apply pb-2 mb-2 border-b border-gray-100;
+}
+
+@utility resume-column-1 {
+  @apply w-25/100 flex-none;
+}
+
+@utility header {
+  @apply font-semibold text-gray-800;
+}
+
+@utility light-text {
+  @apply font-light text-gray-800;
+}
+
+body {
+  padding: 0.5in 0.75in 0 0.75in;
+}
+
+a {
+  @apply font-medium underline;
+}
+
+h1 {
+  @apply text-lg header;
+}
+
+h2 {
+  @apply header;
+}
+
+ul {
+  li::marker {
+    @apply text-slate-400;
+  }
+  ul {
+    li::marker {
+      @apply text-gray-300;
+    }
+  }
+}

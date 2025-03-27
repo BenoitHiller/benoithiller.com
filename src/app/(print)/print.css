@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+
+@page {
+  /* This is the same as the height and width below but css variables don't
+   * appear to work correctly within the @page element, at least in Firefox */
+  size: 8.5in 11in;
+  /* Previewing the content with provided margins is frustrating so they are
+   * instead implemented within the page. */
+  margin: 0;
+}
+
+/*
+ * None of the browsers currently provide a working print layout emulation
+ * solution. They will allow you to emulate the media query, which is a start,
+ * but to actually develop a print layout that simply is not sufficient.
+ *
+ * So for printable pages the following code is provided to do the minimum
+ * needed to emulate a reasonable preview window by setting the size of the
+ * body and placing at the middle of the viewport with a background to emulate
+ * the appearance within the preview window.
+ */
+@media not print {
+  html {
+    @apply flex h-dvh items-center;
+    background-color: var(--color-gray-500);
+  }
+
+  body {
+    width: 8.5in;
+    height: 11in;
+    margin: auto;
+    background-color: white;
+  }
+}
