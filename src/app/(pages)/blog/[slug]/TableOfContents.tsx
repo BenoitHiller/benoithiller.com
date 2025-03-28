@@ -100,7 +100,7 @@ const TableOfContents: React.FC<{ className?: string; entries: Toc }> = ({
   }, [entries]);
 
   return (
-    <div className={classNames('flex flex-col gap-2', className)}>
+    <div className={classNames('flex flex-col gap-2 w-[inherit]', className)}>
       <h3>Contents</h3>
       <CurrentIdContext value={currentId}>
         <Section entries={entries} />
