@@ -8,7 +8,9 @@ const nextConfig: NextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   env: {
     blogPath: path.resolve(__dirname, 'src/blog'),
-    rootPath: path.resolve(__dirname)
+    rootPath: path.resolve(__dirname),
+    fallbackLocale: 'en-US',
+    fallbackTimeZone: 'America/Toronto'
   },
   images: {
     unoptimized: true
