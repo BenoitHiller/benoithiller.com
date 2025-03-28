@@ -21,7 +21,7 @@
  */
 @media not print {
   html {
-    @apply flex h-dvh items-center;
+    @apply flex min-h-dvh items-center;
     background-color: var(--color-gray-500);
   }
 
