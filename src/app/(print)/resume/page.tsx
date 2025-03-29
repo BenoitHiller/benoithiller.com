@@ -121,8 +121,8 @@ function Page() {
       </Job>
       <Job title="Software Engineer" company="Hockeystick.co inc." from="Jan 2017" to="Sep 2017">
         <Task>
-          Acted as the primary contributor on Hockeystick's Reporting and Dealflow applications in
-          Ruby on Rails.
+          Served as the primary code contributor on Hockeystick's Reporting and Dealflow
+          applications in Ruby on Rails.
         </Task>
         <Task>
           Designed and built a React GUI for parsing income statements and balance sheets into a
