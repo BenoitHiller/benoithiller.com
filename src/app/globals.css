@@ -21,11 +21,6 @@
   }
 
   .infobox-content {
-    /* The infobox is self-contained so we want to remove the outer margins */
-    & > :first-child {
-      margin-top: 0;
-    }
-
     & > :last-child {
       margin-bottom: 0;
     }

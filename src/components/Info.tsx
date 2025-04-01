@@ -1,28 +1,34 @@
 import type React from 'react';
+import {
+  ExclamationCircleIcon,
+  ExclamationTriangleIcon,
+  DocumentTextIcon
+} from '@heroicons/react/20/solid';
 
 const BOX_TYPES = {
   info: {
     containerClass: 'bg-sky-50',
-    headerClass: 'text-sky-200',
-    header: 'Info'
+    icon: <ExclamationCircleIcon className="size-6 -mt-2 text-sky-300" />
   },
   note: {
     containerClass: 'bg-violet-50',
-    headerClass: 'text-purple-200',
-    header: 'Note'
+    icon: <DocumentTextIcon className="size-6 -mt-1 text-purple-400" />
   },
   warning: {
     containerClass: 'bg-orange-50',
-    headerClass: 'text-orange-200',
-    header: 'Warning!'
+    icon: <ExclamationTriangleIcon className="size-6 -mt-2 text-orange-400" />
   }
 };
 
 type BoxKind = keyof typeof BOX_TYPES;
 
-const InfoBoxHeader: React.FC<{ type: BoxKind }> = ({ type }) => {
-  const { headerClass, header } = BOX_TYPES[type];
-  return <div className={`font-bold text-sm/8 ${headerClass}`}>{header}</div>;
+const InfoBoxIcon: React.FC<{ type: BoxKind }> = ({ type }) => {
+  const { icon } = BOX_TYPES[type];
+  return (
+    <div className="inline-block not-prose float-right pl-2" aria-label={type} title={type}>
+      {icon}
+    </div>
+  );
 };
 
 const Info: React.FC<{ children: React.ReactNode; type?: BoxKind }> = ({
@@ -31,9 +37,11 @@ const Info: React.FC<{ children: React.ReactNode; type?: BoxKind }> = ({
 }) => {
   const { containerClass } = BOX_TYPES[type];
   return (
-    <div className={`my-4 pt-2 px-4 pb-6 rounded-md ${containerClass}`}>
-      <InfoBoxHeader type={type} />
-      <div className="infobox-content">{children}</div>
+    <div className={`my-4 pt-px px-4 pb-6 rounded-md ${containerClass}`}>
+      <div className="infobox-content">
+        <InfoBoxIcon type={type} />
+        {children}
+      </div>
     </div>
   );
 };
