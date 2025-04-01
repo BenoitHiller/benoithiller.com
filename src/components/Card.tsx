@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 const Tag: React.FC<{ tag: string }> = ({ tag }) => (
-  <li className="inline px-2 rounded-sm bg-blue-50 text-gray-500 font-light">{tag}</li>
+  <li className="inline px-2 rounded-sm bg-blue-50 text-gray-600 font-light">{tag}</li>
 );
 
 const Card: React.FC<{
