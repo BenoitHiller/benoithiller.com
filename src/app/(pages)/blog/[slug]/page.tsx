@@ -22,10 +22,11 @@ async function generateStaticParams() {
 
 async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const { title } = await blogDb.get(slug);
+  const { title, description } = await blogDb.get(slug);
 
   return {
-    title
+    title,
+    description
   };
 }
 
