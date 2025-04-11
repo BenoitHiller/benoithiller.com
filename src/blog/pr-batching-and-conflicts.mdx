@@ -1,10 +1,10 @@
 import { joined } from '@/stringUtils';
 import { Note, Info } from '@/components/Info';
 export const metadata = {
-  title: 'Merge Queues and Conflicts',
+  title: 'PR Batching and Conflicts',
   description: joined`
     A description of the automatic conflict resolution system I built at
-    Hockeystick leveraging a custom merge queue.`,
+    Hockeystick.`,
   publishedAt: new Date("2025-04-10T17:00:00-04:00")
 }
 
@@ -14,22 +14,29 @@ If you get your checks to go decently fast that number can work for a fairly lar
 
 If you want to go beyond this limit your are going to need some way to relax that up-to-date requirement.
 
-A merge queue is one technique for relaxing the up-to-date requirement without giving up too much in terms of correctness. If you can create a set of PRs that you can merge together in a given order without conflicts or failing checks on the result, then you allow them to all merge at once.
+A merge train or queue is a technique for relaxing the up-to-date requirement without giving up too much in terms of correctness. If you can create a set of PRs that you can merge together in a given order without conflicts or failing checks on the result, then you allow them to all merge at once.
 
 With respect to the constraint this has similar properties to allowing PRs to be out of date by a small fixed amount of time, but with more structure.
 
 ## The Problem
 
-So right now merge queues are a feature [available on GitHub](https://github.blog/engineering/engineering-principles/how-github-uses-merge-queue-to-ship-hundreds-of-changes-every-day/), but back in late 2021 they hadn't been announced yet and at Hockeystick we were running into some issues that lead me to construct a similar solution.
-
-We were nowhere near the team size you would usually need to hit the limits I mentioned above, but there were some other problems that got us there:
+Back in late 2021 at Hockesytick we were having some issues with PRs being stalled for a long time as described above.
+We were nowhere near the team size you would usually need to hit the limits I mentioned above, but there were some other things that got us there:
 
 1. We were unfortunately relying on an amount of manual QA. This is in effect equivalent to an extremely long running CI check.
 2. We were having a lot of cases where developers had real conflicts with other PRs that required manual resolution.
 
+<Note>
+  At the time GitLab had released its [merge trains](https://about.gitlab.com/blog/2020/01/30/all-aboard-merge-trains/) implementation but I was not yet aware of it. We were on GitHub and they wouldn't announce [merge queues](https://github.blog/engineering/engineering-principles/how-github-uses-merge-queue-to-ship-hundreds-of-changes-every-day/) until a bit later.
+
+  I was basing my idea for this off of how the `linux-next` tree is contstructed by taking all the potential changes for the next merge window and attempting various merge orders to build the largest combined tree out of them. That is likely the original inspiration for the other versions as well.
+
+  I'm going to call it a queue in general because train has a sort of awkward fit with the idea. Especially if you want to try and go faster by building a tree rather than a sequence of merges like the linux kernel version does, as then the individual PRs are no longer connected like train cars. A batch or window would probably be more fitting.
+</Note>
+
 ## Building a Queue
 
-To address these problems I start by building out a system to simply generate a batched PR from the all of the open ones against `main`.
+So I start by building out a system to simply generate a batched PR from the all of the open ones against `main`.
 
 Take everything open, approved, and passing checks, then iterate in PR number order to attempt to merge them one by one into a branch called `ci/development` that starts at main. Anything with conflicts is simply skipped at this point.
 
@@ -41,9 +48,13 @@ To get to something that makes nice batches for QA we then need to add a way for
   One thing GitHub mentions in their documents on merge queues is that they specifically avoided a system involving tagging PRs. They have the right idea there as the tooling to manage these tags and provide adequate visibility of them expanded quite quickly.
 </Info>
 
-One interesting issue I discovered in the process is that for the QA branch it was undesirable to kick PRs out of the build unless the label is manually removed or the feature is merged. That means that I ended up making the queue a bit stateful, it would inspect the previous result and abort entirely rather than produce an integration branch that was missing things previously included(which you could obviously manually override in a few ways).
+One interesting issue I discovered in the process is that for the QA branch it was undesirable to kick PRs out of the build unless the label was manually removed or the feature was merged. That means that I ended up making the queue a bit stateful, it would inspect the previous result and abort entirely rather than produce a QA integration branch that was missing things previously included(which you could manually override in a few ways).
 
-That idea should be at least a bit concerning if you think about it as it implies that the QA process involves doing something meaningful using code that cannot be the final code actually merged. There is an analogue to the idea of performing anything less than the full test suite of the entire application in response to any single change to the code. If you haven't looked at the source you don't know that the changes are constrained to a single area, and even if you do look at the source it can be very hard to be certain of that.
+<Note>
+  That idea should be at least a bit concerning if you think about it as it implies that the QA process involves doing something meaningful using code that cannot be the final code actually merged.
+
+  There is an analogue to the idea of performing anything less than the full test suite of the entire application in response to any single change to the code. If you haven't looked at the source you don't know that the changes are constrained to a single area, and even if you do look at the source it can be very hard to be certain of that.
+</Note>
 
 ## Conflict Resolution
 
@@ -201,8 +212,6 @@ Now each of `p1'` to `pn'` will have nearly the same changed lines as their coun
 
 <Note>
   The tradeoff for this approach is pretty significant. The `pn'` may look on the surface to be similar to the contents of the original PR, but there is no guarantee that the state of the repository at that commit has much meaning. If there were conflicts it is quite likely that the commits represent nonsensical repository states that don't pass checks.
-
-  If you think about how you would use `git bisect` to find an issue in this version of the code, you would end up essentially building a custom tool to run the same algorithm but only considering the `merged'` commits. That kind of thing strikes me as a big red flag.
 </Note>
 
 ## Thoughts
@@ -211,6 +220,10 @@ This was something that I enjoyed building, and that did enable us to move a lot
 
 If anything I hope this serves as a bit of a cautionary tale to help you justify a much more significant up front investment in automated testing.
 
+Worth mentioning though is that something people had a decent amount of trouble with is that they were maintaining two versions of their code at once, with the easily visible version not being the final one. So they would have to be aware enough to check that the version of their code with patches applied also works.
+
+The options for improving that are definitely not simple, you would want to provide tools for the user to edit both versions as they are working rather than on demand. Such as by having their their local environment execute the version of the code with patches applied, but show them the version without patches unless they need to be prompted for new resolutions. It might even then not be possible to get that all the way to a great developer experience.
+
 <Note>
-  One thing I didn't discuss above that is somewhat related to that is that the GitHub model specifically aims to run checks on each intermediary step of the queue. Not being able to do that in a reasonable manner is a further significant tradeoff of the conflict resolution approach used.
+  One thing I didn't discuss above that is somewhat related to that is that the GitHub and GitLab models specifically aims to run checks on each intermediary step of the queue. Not being able to do that in a reasonable manner is a further significant tradeoff of the conflict resolution approach used.
 </Note>
