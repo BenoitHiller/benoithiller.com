@@ -26,3 +26,9 @@
     }
   }
 }
+
+@utility svg-stroke-* {
+  polygon {
+    stroke: --value(--color-*);
+  }
+}

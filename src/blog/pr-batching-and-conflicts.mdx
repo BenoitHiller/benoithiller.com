@@ -133,6 +133,7 @@ The first step is still to simply perform the merge as described before. This cr
 
 ```dot
   digraph commits {
+    node [shape=oval];
     subgraph cluster_main {
       b1;
       color = none;
@@ -146,12 +147,12 @@ The first step is still to simply perform the merge as described before. This cr
     }
 
     subgraph cluster_queue {
-      qlabel [label = "Queue" shape = plain];
+      qlabel [label = "Queue" shape = plaintext];
       qn -> qdot -> q1 -> b1;
       qdot [label="..."];
       merged -> qn;
 
-      color = lightgray;
+      class = "svg-stroke-gray-300"
     }
 
     subgraph cluster_PR {
@@ -159,8 +160,8 @@ The first step is still to simply perform the merge as described before. This cr
       pdot [label="..."];
       merged -> pn;
 
-      color = gray;
-      plabel [label = "Current PR" shape = plain];
+      class = "svg-stroke-gray-500"
+      plabel [label = "Current PR" shape = plaintext];
     }
   }
 ```
@@ -169,6 +170,7 @@ Then we can go about creating the following linear commit graph by making use of
 
 ```dot
   digraph commits {
+    node [shape=oval];
     subgraph cluster_main {
       b1;
       color = none;
@@ -185,8 +187,8 @@ Then we can go about creating the following linear commit graph by making use of
       qn -> qdot -> q1 -> b1;
       qdot [label="..."];
 
-      color = lightgray;
-      qlabel [label = "Queue" shape = plain];
+      class = "svg-stroke-gray-300"
+      qlabel [label = "Queue" shape = plaintext];
     }
 
     subgraph cluster_PR {
@@ -194,8 +196,8 @@ Then we can go about creating the following linear commit graph by making use of
       pdot [label="..."];
       "merged'" -> "pn'";
 
-      color = gray;
-      plabel [label = "Current PR\nrebased" shape = plain];
+      class = "svg-stroke-gray-500"
+      plabel [label = "Current PR\nrebased" shape = plaintext];
     }
   }
 ```

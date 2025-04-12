@@ -1,0 +1,24 @@
+.graph {
+  /* the css-loader setup in nextjs doesn't yet handle this nesting case
+   * correctly, so we have to manually put the & to help it figure out that
+   * there is in fact a local class in each selector. */
+  & g:global(.edge) polygon {
+    fill: var(--color-gray-700);
+    stroke: var(--color-gray-700);
+  }
+
+  & g:global(.node) ellipse {
+    stroke: var(--color-gray-700);
+  }
+
+  & g:global(.cluster) polygon {
+    stroke-width: 0.5;
+  }
+
+  & text {
+    font-weight: var(--font-weight-semibold);
+    font-family: var(--font-mono);
+    /* In a svg the css color prop is only applied to text if the following is set. */
+    fill: currentColor;
+  }
+}
