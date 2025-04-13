@@ -1,4 +1,5 @@
 import { Code } from 'bright';
+import type { BrightProps } from 'bright';
 import React from 'react';
 import * as R from 'ramda';
 import DotGraph from '@/components/DotGraph';
@@ -11,6 +12,10 @@ function isCodeElement(
 
 const codeOverrides: { [key: string]: React.FC<{ children: string }> } = {
   dot: DotGraph
+};
+
+const codeProps: Partial<BrightProps> = {
+  titleClassName: 'bright-title'
 };
 
 /**
@@ -42,7 +47,7 @@ const CodeWrapper: React.FC<{ children: React.ReactNode }> = (props) => {
       }
     }
   }
-  return <Code {...props} />;
+  return <Code {...codeProps} {...props} />;
 };
 
 export default CodeWrapper;

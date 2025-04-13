@@ -25,6 +25,11 @@
       margin-bottom: 0;
     }
   }
+
+  .bright-title + pre {
+    /* prevent the .prose styles from adding an awkward rounded corner below title */
+    border-radius: 0;
+  }
 }
 
 @utility svg-stroke-* {

@@ -23,7 +23,8 @@ const nextConfig: NextConfig = {
 const rehypePlugins = [
   ['rehype-slug'],
   ['@stefanprobst/rehype-extract-toc'],
-  ['@stefanprobst/rehype-extract-toc/mdx']
+  ['@stefanprobst/rehype-extract-toc/mdx'],
+  ['rehype-mdx-code-props']
 ];
 
 const withMDX = createMDX({
