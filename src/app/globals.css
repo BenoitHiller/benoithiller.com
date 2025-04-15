@@ -15,6 +15,7 @@
      * things look missaligned */
     font-size: inherit;
     font-weight: 700;
+    line-height: 16px;
 
     /* Disable automaticaly adding backticks to inline code */
     &::after, &::before {

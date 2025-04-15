@@ -3,6 +3,7 @@ import type { BrightProps } from 'bright';
 import React from 'react';
 import * as R from 'ramda';
 import DotGraph from '@/components/DotGraph';
+import codeTheme from '@/components/codeTheme';
 
 function isCodeElement(
   node: React.ReactNode
@@ -15,7 +16,8 @@ const codeOverrides: { [key: string]: React.FC<{ children: string }> } = {
 };
 
 const codeProps: Partial<BrightProps> = {
-  titleClassName: 'bright-title'
+  titleClassName: 'bright-title',
+  theme: codeTheme
 };
 
 /**
