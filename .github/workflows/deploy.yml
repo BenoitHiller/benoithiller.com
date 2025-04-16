@@ -10,6 +10,9 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  NEXT_PUBLIC_BASE_URL: https://benoithiller.com
+
 jobs:
   build:
     runs-on: ubuntu-latest
