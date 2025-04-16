@@ -1,7 +1,7 @@
 'use client';
 
-import useIsClient from '@/useIsClient';
 import { formatTimestamp } from '@/components/Timestamp';
+import { useIsClient } from '@/components/ClientContext';
 
 // I'm taking an opinionated stand here that the only reasonable format to
 // represent year-month-day is in that order. This is not something you want to

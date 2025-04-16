@@ -4,6 +4,7 @@ import localFont from 'next/font/local';
 import FontFallbackDefinition from '@/components/FontFallbackDefinition';
 import './globals.css';
 import { metadataBase } from '@/sharedMetadata';
+import ClientContext from '@/components/ClientContext';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -29,11 +30,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`scroll-pt-18 ${inter.variable} ${nanumCoding.variable}`}>
-      <head>
-        <FontFallbackDefinition />
-      </head>
-      <body>{children}</body>
-    </html>
+    <ClientContext>
+      <html lang="en" className={`scroll-pt-18 ${inter.variable} ${nanumCoding.variable}`}>
+        <head>
+          <FontFallbackDefinition />
+        </head>
+        <body>{children}</body>
+      </html>
+    </ClientContext>
   );
 }
