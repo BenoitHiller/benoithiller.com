@@ -1,4 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import urlHelper from '@/urlHelper';
+
+export const metadata: Metadata = {
+  alternates: {
+    types: {
+      'application/rss+xml': urlHelper('/blog/rss.xml')
+    }
+  }
+};
 
 function HeaderNavLink({ href, children }: React.PropsWithChildren<{ href: string }>) {
   return (
