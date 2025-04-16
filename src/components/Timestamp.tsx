@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import useIsClient from '@/useIsClient';
 
 const DATETIME_FORMAT: Intl.DateTimeFormatOptions = {
   day: 'numeric',
@@ -11,29 +11,32 @@ const DATETIME_FORMAT: Intl.DateTimeFormatOptions = {
   year: 'numeric'
 };
 
-const DATE_FORMAT: Intl.DateTimeFormatOptions = {
-  dateStyle: 'short'
-};
+function formatTimestamp(
+  value: Date,
+  locale?: string,
+  timeZone?: string,
+  format?: Intl.DateTimeFormatOptions
+) {
+  const selectedFormat = format ?? DATETIME_FORMAT;
 
-const Timestamp: React.FC<{ value: Date; date?: boolean; format?: Intl.DateTimeFormatOptions }> = ({
+  return value.toLocaleString(locale, Object.assign({ timeZone }, selectedFormat));
+}
+
+const Timestamp: React.FC<{ value: Date; format?: Intl.DateTimeFormatOptions }> = ({
   value,
-  date,
   format
 }) => {
-  const [isClient, setClient] = useState(false);
+  const isClient = useIsClient();
 
   // render with a fixed default timezone and locale on the server and then
   // swap that out on the client.
   const locale = isClient ? undefined : process.env.fallbackLocale;
   const timeZone = isClient ? undefined : process.env.fallbackTimeZone;
 
-  useEffect(() => {
-    setClient(true);
-  }, []);
-
-  const selectedFormat = format ?? (date ? DATE_FORMAT : DATETIME_FORMAT);
-
-  return <>{value.toLocaleString(locale, Object.assign({ timeZone }, selectedFormat))}</>;
+  return (
+    <time dateTime={value.toISOString()}>{formatTimestamp(value, locale, timeZone, format)}</time>
+  );
 };
 
+export { formatTimestamp };
 export default Timestamp;
