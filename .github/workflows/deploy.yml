@@ -31,7 +31,7 @@ jobs:
           path: |
             ~/.npm
             ${{ github.workspace }}/.next/cache
-          key: 2-${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('src/**/*', '*.ts', '*.mjs') }}
+          key: 2-${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('src/**/*', '*.ts', '*.js') }}
           restore-keys: |
             2-${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
       - name: Install Dependencies
