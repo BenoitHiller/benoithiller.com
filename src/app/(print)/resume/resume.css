@@ -4,12 +4,12 @@
   @apply pb-2 mb-2 border-b border-gray-100;
 }
 
-@utility resume-column-1 {
-  @apply w-25/100 flex-none;
+@utility section-border-bottom {
+  @apply pb-2 mb-2 border-b border-gray-100;
 }
 
-@utility header {
-  @apply font-semibold text-gray-800;
+@utility resume-column-1 {
+  @apply w-25/100 flex-none;
 }
 
 @utility light-text {
@@ -22,14 +22,6 @@ body {
 
 a {
   @apply font-medium underline;
-}
-
-h1 {
-  @apply text-lg header;
-}
-
-h2 {
-  @apply header;
 }
 
 ul {
