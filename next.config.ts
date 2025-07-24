@@ -49,6 +49,10 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true
   },
   webpack(config) {
+    config.module.rules.push({
+      test: /\.ya?ml$/,
+      use: 'yaml-loader'
+    });
     if (development) {
       // attach our code to replace file:// source paths in development.
       for (const plugin of config.plugins) {
