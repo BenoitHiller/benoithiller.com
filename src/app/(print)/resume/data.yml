@@ -1,0 +1,79 @@
+version: "3.0"
+info:
+  email:
+    text: benoit.hiller@gmail.com
+    link: 'mailto:benoit.hiller@gmail.com'
+  website:
+    text: benoithiller.com
+    link: 'https://benoithiller.com'
+  linkedin:
+    text: linkedin.com/in/BenoitHiller
+    link: 'https://linkedin.com/in/BenoitHiller'
+summary: >-
+  Full-stack software engineer with 10+ years of experience designing, building, and scaling web applications. Recognized for strong ownership, mentoring, and driving process improvements that elevate team performance.
+experience:
+  - title: "Senior Software Engineer"
+    company: "Hockeystick.co inc."
+    from: "Sept 2017"
+    to: "Apr 2022"
+    tasks:
+      - Led the frontend development team, providing technical guidance, setting coding standards, and defining software architecture.
+      - Contributed to backend development to deliver robust, performant APIs and infrastructure across AWS and Azure.
+      - Mentored junior team members and co-op students and supervised outside contractors.
+      - Took full platform ownership during a leadership transition between CTOs, including technical interviewing for senior hires and executives.
+    achievements:
+      - Improved performance of search queries by 10x through SQL query optimization.
+      - Implemented a unified authentication service (Rails, GraphQL, OIDC, SAML) enabling SSO across all products.
+      - Reduced ticket delivery time by an average of 1 day through process automation and workflow optimization.
+  - title: "Software Engineer"
+    company: "Hockeystick.co inc."
+    from: "Jan 2017"
+    to: "Sept 2022"
+    tasks:
+      - Built key modules for Reporting and Dealflow applications in Ruby on Rails.
+  - title: "Software Developer"
+    company: "Imation (now Nexsan)"
+    from: "May 2013"
+    to: "Jul 2014"
+    tasks:
+      - Worked as an ActionScript and Java developer on the GUI for the Nexsan NAS servers.
+other:
+  - title: "Independent Consulting & Learning"
+    from: "May 2022"
+    to: "Present"
+    tasks:
+      - Provided consulting support to small businesses on web application development.
+      - Continued professional development through research and personal projects in TypeScript, Next.js, and C#.
+skills:
+  Programming Languages:
+    - ActionScript
+    - Bash
+    - C#
+    - Elixir
+    - Java
+    - JavaScript
+    - Python
+    - Ruby
+    - SQL
+    - TypeScript
+  Frameworks:
+    - Flask
+    - Gatsby
+    - .NET Core
+    - Next.js
+    - Rails
+    - React
+  "Cloud & DevOps":
+    - AWS
+    - Azure
+    - Docker
+    - Git
+    - CI/CD (Azure Pipelines, CircleCI, GitHub Actions)
+
+education:
+  school: McGill University
+  degree: Bachelor of Science
+  field: Computer Science
+  from: 'Sept 2009'
+  to: 'May 2013'
+  year: '2013'

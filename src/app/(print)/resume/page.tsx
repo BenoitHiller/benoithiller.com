@@ -1,21 +1,51 @@
 import * as R from 'ramda';
 import './resume.css';
+import data from './data.yml';
+import type { InfoItem } from './data.yml';
+import type { Metadata } from 'next';
 
-const HeaderLink: React.FC<{ label: string; href?: string; text: string }> = ({
-  label,
-  href,
-  text
-}) => (
+const info = data.info;
+
+const joinWithCommas = R.pipe(R.intersperse(', '), R.join(''));
+
+const SectionHeader: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <h2 className="text-lg">{children}</h2>
+);
+
+const SubSectionHeader: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <h3 className="text-sm text-gray-700">{children}</h3>
+);
+
+const Title: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <h1 className="resume-column-1 text-lg font-semibold text-gray-800">{children}</h1>
+);
+
+const HeaderLink: React.FC<{ label: string; info: InfoItem }> = ({ label, info }) => (
   <div className="relative">
     <div className="absolute -top-full light-text">{label}</div>
-    <a target="_blank" href={href ?? text}>
-      {text}
+    <a target="_blank" href={info.link}>
+      {info.text}
     </a>
   </div>
 );
 
-const Task: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+const Summary: React.FC = () => (
+  <>
+    <SectionHeader>Summary</SectionHeader>
+    <div className="light-text section-border-bottom">{data.summary}</div>
+  </>
+);
+
+const ListItem: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <li className="list-disc list-slate-400 mb-[2px]">{children}</li>
+);
+
+const UnorderedList: React.FC<{ items: string[] }> = ({ items }) => (
+  <ul className="mt-1 ml-[1em] shrink light-text">
+    {items.map((item, i) => (
+      <ListItem key={i}>{item}</ListItem>
+    ))}
+  </ul>
 );
 
 const Job: React.FC<{
@@ -23,8 +53,9 @@ const Job: React.FC<{
   company: string;
   from: string;
   to: string;
-  children?: React.ReactNode;
-}> = ({ title, company, from, to, children }) => (
+  tasks: string[];
+  achievements?: string[];
+}> = ({ title, company, from, to, tasks, achievements }) => (
   <div className="flex flex-col">
     <div className="flex gap-2">
       <div className="font-semibold text-gray-800">{company}</div>
@@ -33,29 +64,89 @@ const Job: React.FC<{
         {from}&ndash;{to}
       </div>
     </div>
-    <ul className="mt-1 ml-[1em] shrink light-text">{children}</ul>
+    <UnorderedList items={tasks} />
+    {achievements?.length && (
+      <>
+        <SubSectionHeader>Key Achievements</SubSectionHeader>
+        <UnorderedList items={achievements} />
+      </>
+    )}
   </div>
 );
 
-const normalizeSkill = R.pipe(R.replace(/^\./, ''), R.toLower);
-const skillSort = R.sort<string>(R.ascend(normalizeSkill));
-const buildSkillsList = R.pipe(skillSort, R.intersperse(', '), R.join(''));
-
-const SkillsSection: React.FC<{ title: string; skills: string[] }> = ({ title, skills }) => (
-  <div className="resume-section">
-    <SectionHeader>{title}</SectionHeader>
-
-    <ul className="shrink light-text">{buildSkillsList(skills)}</ul>
+const Other: React.FC<{
+  title: string;
+  from: string;
+  to: string;
+  tasks: string[];
+}> = ({ title, from, to, tasks }) => (
+  <div className="flex flex-col">
+    <div className="flex gap-2">
+      <div>{title}</div>
+      <div className="font-light">
+        {from}&ndash;{to}
+      </div>
+    </div>
+    <UnorderedList items={tasks} />
   </div>
 );
 
-const SectionHeader: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <h2 className="text-sm">{children}</h2>
+const Experience: React.FC = () => (
+  <>
+    <SectionHeader>Work Experience</SectionHeader>
+    <div className="flex flex-col gap-2 section-border-bottom">
+      {data.experience.map((job) => (
+        <Job key={job.from} {...job} />
+      ))}
+    </div>
+  </>
 );
 
-const Title: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <h1 className="resume-column-1 text-lg font-semibold text-gray-800">{children}</h1>
+const OtherExperience: React.FC = () => (
+  <>
+    <SectionHeader>Other Experience</SectionHeader>
+    <div className="flex flex-col gap-2 section-border-bottom">
+      {data.other.map((other) => (
+        <Other key={other.from} {...other} />
+      ))}
+    </div>
+  </>
 );
+
+const SkillsSection: React.FC<{ label: string; skills: string[] }> = ({ label, skills }) => (
+  <div>
+    <SubSectionHeader>{label}</SubSectionHeader>
+
+    <ul className="shrink light-text">{joinWithCommas(skills)}</ul>
+  </div>
+);
+
+const Skills: React.FC = () => (
+  <>
+    <SectionHeader>Skills</SectionHeader>
+    <div className="flex flex-col gap-2 section-border-bottom">
+      {Object.entries(data.skills).map(([label, skills]) => (
+        <SkillsSection key={label} label={label} skills={skills} />
+      ))}
+    </div>
+  </>
+);
+
+const Education: React.FC = () => {
+  const { school, field, degree, year } = data.education;
+
+  return (
+    <div className="resume-section">
+      <SectionHeader>Education</SectionHeader>
+
+      <div className="shrink light-text">
+        {degree}: {field} from {school} ({year})
+      </div>
+    </div>
+  );
+};
+
+export const metadata: Metadata = { title: `Benoit Hiller-v${data.version}` };
 
 function Page() {
   return (
@@ -63,161 +154,16 @@ function Page() {
       <div className="resume-section flex gap-4 items-baseline">
         <Title>Benoit Hiller</Title>
         <div className="flex items-baseline gap-8 w-full shrink">
-          <HeaderLink
-            label="email:"
-            href="mailto:benoit.hiller@gmail.com"
-            text="benoit.hiller@gmail.com"
-          />
-          <HeaderLink label="website:" href="https://benoithiller.com" text="benoithiller.com" />
-          <HeaderLink
-            label="LinkedIn:"
-            href="https://linkedin.com/in/BenoitHiller"
-            text="linkedin.com/in/BenoitHiller"
-          />
+          <HeaderLink label="email:" info={info['email']} />
+          <HeaderLink label="website:" info={info['website']} />
+          <HeaderLink label="LinkedIn:" info={info['linkedin']} />
         </div>
       </div>
-      <SectionHeader>Experience</SectionHeader>
-      <div className="flex flex-col gap-2 section-border-bottom">
-        <Job
-          title="Senior Software Engineer"
-          company="Hockeystick.co inc."
-          from="Sept 2017"
-          to="Apr 2022"
-        >
-          <Task>
-            Led the frontend development team on multiple flagship products using JavaScript,
-            TypeScript, React, Next.js, Gatsby, and GraphQL.
-          </Task>
-          <Task>
-            Simultaneously contributed to backend development for those products in C# and Elixir,
-            as well as to infrastructure design and implementation on AWS and Azure.
-          </Task>
-          <Task>
-            Designed and implemented a shared authentication service for Hockeystick's applications
-            in Ruby on Rails, providing a GraphQL API for user management as well as OIDC and SAML
-            IdP integration.
-          </Task>
-          <Task>
-            Championed numerous engineering processes improvements including:
-            <ul className="ml-[1em]">
-              <Task>Developing code style guides.</Task>
-              <Task>Implementing PR checks and CI build infrastructure.</Task>
-              <Task>
-                Building custom Jira and Slack integrations to ease coordination with the rest of
-                the team.
-              </Task>
-              <Task>
-                Identifying developer pain points and building out tooling or code solutions to
-                address them.
-              </Task>
-              <Task>
-                Maintaining the corresponding editor configurations and documentation for all of the
-                aforementioned.
-              </Task>
-            </ul>
-          </Task>
-          <Task>
-            Mentored junior team members, co-op students, and even a few outside contractors in
-            software development.
-          </Task>
-          <Task>
-            Coordinated directly with clients on technical specifications for custom features,
-            external API integrations, and integrations with external authentication providers.
-          </Task>
-          <Task>
-            Took over full platform ownership during the interim when the company was looking for a
-            new CTO and performed the technical interviews for that position.
-          </Task>
-        </Job>
-        <Job title="Software Engineer" company="Hockeystick.co inc." from="Jan 2017" to="Sep 2017">
-          <Task>
-            Served as the primary code contributor on Hockeystick's Reporting and Dealflow
-            applications in Ruby on Rails.
-          </Task>
-          <Task>
-            Designed and built a React GUI for parsing income statements and balance sheets into a
-            standard format so as to aggregate data between differing company reporting practices.
-          </Task>
-        </Job>
-        <Job
-          title="Software Developer"
-          company="Imation (now Nexsan)"
-          from="May 2013"
-          to="Jul 2014"
-        >
-          <Task>
-            Worked as a fullstack developer on the configuration UI for Imation's NAS products using
-            ActionScript and Java.
-          </Task>
-          <Task>Implemented libzfs JNA bindings for configuring ZFS from Java.</Task>
-          <Task>
-            Wrote software to apply, verify, and rollback network setting changes via the
-            configuration UI without interrupting the connection to the user.
-          </Task>
-        </Job>
-      </div>
-      <SkillsSection
-        title="Programming Languages"
-        skills={[
-          'TypeScript',
-          'JavaScript',
-          'Ruby',
-          'C#',
-          'Elixir',
-          'Bash',
-          'SQL',
-          'Java',
-          'ActionScript',
-          'Python'
-        ]}
-      />
-      <SkillsSection
-        title="Frameworks &amp; Libraries"
-        skills={[
-          'React',
-          'Rails',
-          '.NET Core',
-          'Next.js',
-          'Gatsby',
-          'Ecto',
-          'EFCore',
-          'HotChocolate',
-          'Ramda',
-          'Apollo Client',
-          'Relay',
-          'Redux',
-          'Redux-Saga',
-          'Flask',
-          'SQLAlchemy'
-        ]}
-      />
-      <SkillsSection
-        title="Tools &amp; Infrastructure"
-        skills={[
-          'Azure',
-          'AWS',
-          'Docker',
-          'Git',
-          'GraphQL',
-          'SAML',
-          'OAuth2',
-          'OIDC',
-          'PostgreSQL',
-          'SQL Server',
-          'NGINX',
-          'GitHub Actions',
-          'CircleCI',
-          'BitBucket Pipelines',
-          'Vagrant'
-        ]}
-      />
-      <div className="resume-section">
-        <SectionHeader>Education</SectionHeader>
-
-        <div className="shrink light-text">
-          Bachelor of Science: Computer Science from McGill University (2013)
-        </div>
-      </div>
+      <Summary />
+      <Skills />
+      <Experience />
+      <OtherExperience />
+      <Education />
     </article>
   );
 }
