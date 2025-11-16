@@ -7,11 +7,6 @@ import * as TwoColumns from '@/components/TwoColumns';
 
 import * as blogDb from '@/data/blog';
 
-type Params = { slug: string };
-type Props = {
-  params: Promise<Params>;
-};
-
 export const dynamicParams = false;
 
 async function generateStaticParams() {
@@ -20,7 +15,7 @@ async function generateStaticParams() {
   return paths.map((entry) => ({ slug: path.parse(entry).name }));
 }
 
-async function generateMetadata({ params }: Props): Promise<Metadata> {
+async function generateMetadata({ params }: PageProps<'/blog/[slug]'>): Promise<Metadata> {
   const { slug } = await params;
   const { title, description } = await blogDb.get(slug);
 
@@ -30,7 +25,7 @@ async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-async function Page({ params }: Props) {
+async function Page({ params }: PageProps<'/blog/[slug]'>) {
   const { slug } = await params;
   const post = await blogDb.get(slug);
   const { Component, title, tableOfContents } = post;
