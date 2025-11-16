@@ -17,6 +17,9 @@ const ClientContext = React.createContext<boolean>(false);
 const ClientContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
+    // We know that the cascading re-renders don't occur as the setState is called with a constant
+    // and never updated anywhere else.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsClient(true);
   }, []);
 

@@ -7,13 +7,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@mdx-js/loader": "^3.1.0",
     "@mdx-js/react": "^3.1.0",
-    "@next/mdx": "^15.2.2",
+    "@next/mdx": "16.0.3",
     "@stefanprobst/rehype-extract-toc": "^3.0.0",
     "@tailwindcss/postcss": "^4.1",
     "@tailwindcss/typography": "^0.5.16",
@@ -21,19 +21,19 @@
     "@types/mdx": "^2.0.13",
     "@types/node": "^22",
     "@types/ramda": "^0.30.2",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "19.2.5",
+    "@types/react-dom": "19.2.3",
     "@types/rss": "^0.0.32",
     "@viz-js/viz": "^3.12.0",
     "bright": "^1.0.0",
     "classnames": "^2.5.1",
     "isomorphic-git": "^1.30.1",
     "lodash.debounce": "^4.0.8",
-    "next": "^15.2.3",
+    "next": "16.0.3",
     "ramda": "^0.30.1",
     "ramda-adjunct": "^5.1.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
     "rehype-mdx-code-props": "^3.0.1",
     "rehype-slug": "^6.0.0",
     "rss": "^1.2.2",
@@ -44,9 +44,13 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "eslint": "^9",
-    "eslint-config-next": "15.2.2",
+    "eslint-config-next": "16.0.3",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.3",
     "prettier": "3.5.3"
+  },
+  "overrides": {
+    "@types/react": "19.2.5",
+    "@types/react-dom": "19.2.3"
   }
 }
