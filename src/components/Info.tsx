@@ -25,7 +25,12 @@ type BoxKind = keyof typeof BOX_TYPES;
 const InfoBoxIcon: React.FC<{ type: BoxKind }> = ({ type }) => {
   const { icon } = BOX_TYPES[type];
   return (
-    <div className="inline-block not-prose float-right pl-2" aria-label={type} title={type}>
+    <div
+      role="img"
+      className="inline-block not-prose float-right pl-2"
+      aria-label={type}
+      title={type}
+    >
       {icon}
     </div>
   );
