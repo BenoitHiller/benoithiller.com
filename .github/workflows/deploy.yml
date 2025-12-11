@@ -28,11 +28,11 @@ jobs:
           node-version: "23"
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          cache: true
       - name: Install Dependencies
         run: pnpm install
       - name: Build
+        # Note: the warning for missing cache is intentional. With the current size of this project
+        # the builds are substantially faster without it.
         run: pnpm build
       - name: Upload Artifact
         id: upload_artifact
