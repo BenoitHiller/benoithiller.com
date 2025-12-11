@@ -26,18 +26,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "23"
-      - uses: actions/cache@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          path: |
-            ~/.npm
-            ${{ github.workspace }}/.next/cache
-          key: 2-${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('src/**/*', '*.ts', '*.js') }}
-          restore-keys: |
-            2-${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+          cache: true
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install
       - name: Build
-        run: npm run build
+        run: pnpm build
       - name: Upload Artifact
         id: upload_artifact
         uses: actions/upload-pages-artifact@v3
