@@ -1,0 +1,3 @@
+overrides:
+  '@next/mdx': $next
+  eslint-config-next: $next

@@ -4,6 +4,10 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@next/mdx': ^16.0.10
+  eslint-config-next: ^16.0.10
+
 importers:
 
   .:
