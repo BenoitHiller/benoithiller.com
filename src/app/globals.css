@@ -2,42 +2,52 @@
 @plugin "@tailwindcss/typography";
 
 @theme inline {
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-nanum-coding), var(--font-nanum-coding-fallback), monospace;
+  --font-sans: var(--font-mplus), sans serif;
+  --font-mono: var(--font-cascadia), monospace;
 }
 
 .prose {
   /* lighten the code text a bit to match because we adjusted the font-size */
-  --tw-prose-code: var(--color-gray-700);
+  --tw-prose-code: var(--color-gray-800);
+  --tw-prose-quotes: var(--color-gray-700);
+  font-weight: 400;
+
+  pre code {
+    line-height: 19px;
+  }
 
   code {
     /* Override the code that sets the code font size smaller because it makes
-     * things look missaligned */
-    font-size: inherit;
-    font-weight: 700;
-    line-height: 16px;
-
-    /* Disable automaticaly adding backticks to inline code */
+     * things look misaligned */
+    font-size: 16px;
+    font-weight: 400;
+    /* Disable automatically adding backticks to inline code */
     &::after, &::before {
       content: unset;
     }
   }
 
-  .infobox-content {
-    & > :last-child {
-      margin-bottom: 0;
+  :where(p):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
+    margin-top: --spacing(5);
+    margin-bottom: --spacing(3);
+  }
+
+  blockquote {
+    font-style: unset;
+    p:first-of-type::before,
+    p:last-of-type::after {
+      /* I don't know why they would think putting the quotes in looks nice when they are drawing
+       * the left hand border as well. */
+      content: unset;
     }
   }
 
-  .bright-title {
-    div[data-bright-tab] {
-      font-family: var(--font-mono) !important;
-    }
+  p + .heading-h3 {
+    margin-top: --spacing(3);
   }
 
-  .bright-title + pre {
-    /* prevent the .prose styles from adding an awkward rounded corner below title */
-    border-radius: 0;
+  .info-box + .info-box {
+    margin-top: 0;
   }
 }
 
@@ -45,4 +55,26 @@
   polygon {
     stroke: --value(--color-*);
   }
+}
+
+@utility expand-l-* {
+  padding-left: --spacing(--value(integer));
+  margin-left: --spacing(--value(integer) * -1);
+}
+
+@utility expand-r-* {
+  padding-right: --spacing(--value(integer));
+  margin-right: --spacing(--value(integer) * -1);
+}
+
+@utility expand-to-edge {
+  @apply max-md:expand-l-6 max-md:expand-r-6 md:expand-l-8 md:expand-r-10
+}
+
+@utility -wplus-* {
+  width: calc(100% - --spacing(--value(integer)));
+}
+
+@utility wplus-* {
+  width: calc(100% + --spacing(--value(integer)));
 }

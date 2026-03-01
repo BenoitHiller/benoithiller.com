@@ -1,17 +1,10 @@
-import type { BrightProps } from 'bright';
+import type { ThemeRegistration } from 'shiki';
 
-/* Remember: every single type which appears anywhere anywhere in a public API
- * needs to be exported somewhere from that same API. Otherwise building things
- * derived from your code involves dong something like this or worse: poking
- * around in your source and taking on some of your dependencies just to get
- * reasonable types.
- */
-type Theme = Extract<NonNullable<BrightProps['theme']>, object>;
-type ThemeColors = NonNullable<Theme['tokenColors']>;
+type ThemeColors = NonNullable<ThemeRegistration['tokenColors']>;
 
 // I've copied in the full palette from my vim theme, but some colors aren't
 // used here yet.
-const Black = '#1A1A1A';
+const Black = '#252525';
 // const DarkRed = '#C73205';
 // const DarkGreen = '#58AD06';
 const DarkYellow = '#C0751E';
@@ -54,13 +47,13 @@ function mapColors(flatColors: { [key: string]: string }): ThemeColors {
 
 /**
  * A variation on https://github.com/BenoitHiller/hiller.vim in the vscode
- * textmate-ish format for use with the Bright code highlighter.
+ * textmate-ish format used widely for cude highlighting.
  *
  * As a result of wanting to use it for web I swapped out a few of the bright
  * yellow tokens. They are quite jarring when used on a page that is mostly a
  * lighter colorscheme.
  */
-const theme: Theme = {
+const theme: ThemeRegistration = {
   name: 'hiller',
   /*
    * I started with a list of every highlighting item in textmate-color.json in
@@ -167,9 +160,7 @@ const theme: Theme = {
     'variable.other.readwrite.alias': Normal,
     'variable.other.constant.ruby': Parameter
   }),
-  // For these https://github.com/code-hike/lighter/blob/main/lib/src/theme.ts
-  // has some guidance on which of these are actually used out of the full set
-  // possible.
+
   colors: {
     'editor.background': Black,
     'editor.foreground': White,
