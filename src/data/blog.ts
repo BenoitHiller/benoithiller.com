@@ -62,6 +62,17 @@ const get: (slug: string) => Promise<BlogPost> = cache(async (slug) => {
 
   const { title, description, publishedAt } = metadata ?? {};
 
+  // For drafts skip looking them up in git.
+  if (slug.endsWith('.draft')) {
+    return {
+      slug,
+      title,
+      description,
+      Component,
+      tableOfContents
+    };
+  }
+
   const filepath = path.join(process.env.blogPath!, `${slug}.mdx`);
   const gitRoot = process.env.rootPath!;
   const relativePath = path.relative(gitRoot, filepath);
