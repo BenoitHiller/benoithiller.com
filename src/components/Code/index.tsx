@@ -2,22 +2,17 @@ import React from 'react';
 import * as R from 'ramda';
 import DotGraph from '@/components/DotGraph';
 import codeTheme from '@/components/codeTheme';
-import { createHighlighter, bundledLanguages } from 'shiki';
 import type { ShikiTransformer } from 'shiki';
 import type { JSX } from 'react';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import { Fragment } from 'react';
 import { jsx, jsxs } from 'react/jsx-runtime';
+import { codeToHast } from './highlighter';
 
 const DEFAULT_STYLE = `color:${codeTheme.colors!['editor.foreground']}`;
 const codeOverrides: { [key: string]: React.FC<{ children: string }> } = {
   dot: DotGraph
 };
-
-const highlighter = createHighlighter({
-  themes: [codeTheme],
-  langs: Object.keys(bundledLanguages)
-});
 
 interface ParsedCode {
   code: string;
@@ -85,9 +80,7 @@ const removeEmptyLines: ShikiTransformer = {
 };
 
 const Code: React.FC<{ code: string; lang: string }> = async ({ code, lang }) => {
-  const hast = await (
-    await highlighter
-  ).codeToHast(code, {
+  const hast = await codeToHast(code, {
     lang,
     theme: 'hiller',
     mergeSameStyleTokens: true,
@@ -109,9 +102,12 @@ const Code: React.FC<{ code: string; lang: string }> = async ({ code, lang }) =>
         }
       },
       pre: (props) => (
-        <pre {...props} className="expand-to-edge mt-0 mb-0 max-md:py-6 md:py-8 rounded-none" />
+        <pre
+          {...props}
+          className="expand-to-edge max-md:py-6 md:py-8 overflow-x-auto pr-8 prose-spacing collapse-before"
+        />
       ),
-      code: (props) => <code {...props} className="block pr-6" />
+      code: (props) => <code {...props} className="block w-min" />
     }
   }) as JSX.Element;
 };

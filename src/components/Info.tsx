@@ -48,7 +48,9 @@ const Info: React.FC<{ children: React.ReactNode; type?: BoxKind }> = ({
 }) => {
   const { containerClass } = BOX_TYPES[type];
   return (
-    <div className={`info-box expand-to-edge py-1 mt-5 ${containerClass}`}>
+    <div
+      className={`info-box expand-to-edge py-6 prose-spacing collapse-before collapse-after ${containerClass}`}
+    >
       <div className="group info-box-content">
         <InfoBoxIcon type={type} />
         {children}

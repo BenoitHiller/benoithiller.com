@@ -20,7 +20,7 @@ const Footer: React.FC<{ post: BlogPost }> = ({ post: { publishedAt, updatedAt }
   }
 
   return (
-    <footer className="mb-12">
+    <footer className="my-8 pt-6 border-t-1 border-t-gray-950/5 expand-to-edge">
       <dl className="prose">
         <dt>Author</dt>
         <dd>Benoit Hiller</dd>

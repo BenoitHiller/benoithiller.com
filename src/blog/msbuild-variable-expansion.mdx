@@ -30,8 +30,6 @@ The shared `SCREAMING_SNAKE_CASE` rules are included in the [Shared Grammar Rule
   An example of this is the registry property expansions. The Expander just grabs everything within the delimiters for the registry path, but when that is actually processed the code fetching registry values will further parse that to determine if it is a valid registry path.
 </Note>
 
----
-
 ## Metadata Expansion
 ```ruby
 metadata_expansion = "%(" [ IDENTIFIER "." ] IDENTIFIER ")"
@@ -46,15 +44,14 @@ The `MetadataName` specifies which metadata field to look up. `ItemType` specifi
 
 The `ItemType` can only be omitted when the expression appears in a context that is operating on a specific set of items already, so that it can be assumed that set is what you are fetching metadata from.
 
----
-
 ## Property Expansion
 ```ruby
 indexer = "[" [ ARGUMENTS ] "]"
 method_call = "." IDENTIFIER [ "(" [ ARGUMENTS ] ")" ]
 
 registry_lookup = "Registry:" REGISTRY_PATH [ "@" REGISTRY_KEY ]
-static_method = "[" TYPE_NAME "]::" IDENTIFIER [ "(" [ ARGUMENTS ] ")" ]
+static_method =
+    "[" TYPE_NAME "]::" IDENTIFIER [ "(" [ ARGUMENTS ] ")" ]
 
 remainder = *( indexer / method_call )
 
@@ -68,7 +65,10 @@ property_expansion = "$(" [ property_expansion_body ] ")"
 A property expansion has 3 forms
 
 1. Simple properties `$(PropertyName)`
-2. Static method invocations e.g. `$([ClassName]::MethodName("argument"))`
+2. Static method invocations e.g.
+  ```powershell
+  $([ClassName]::MethodName("argument"))
+  ```
 3. Registry properties e.g. `$(Registry:Path@Location)`
 
 ### Simple Properties
@@ -196,8 +196,6 @@ After spitting the arguments, each has property expansion performed on it recurs
   As a result of these type conversions you will want to beware of potential ambiguity when a method has multiple implementations with the same number of arguments.
 </Info>
 
----
-
 ## Item Expansion
 
 ```ruby
@@ -245,7 +243,8 @@ Also different from property expansion is that here each transform step is alway
 
 ```powershell
 @(Items->'%(MetadataName)')
-@(Items->HasMetadata('MetadataName')->'%(MetadataName): %(OtherMetadataName)')
+@(Items->HasMetadata('MetadataName')
+    ->'%(MetadataName): %(OtherMetadataName)')
 ```
 
 If the transform is a single quoted string it has the effect of mapping the Include value of each item into that string. Then after that metadata expansion is performed within the resulting string in the context of the item being processed.
@@ -292,8 +291,6 @@ If an item separator is specified at the end of the item expansion instead of ou
 
 This output is literally just a string so it doesn’t preserve any metadata.
 
----
-
 ## Shared Grammar Rules
 
 The rules `ALPHA` and `DIGIT` are defined in [Appendix B](https://datatracker.ietf.org/doc/html/rfc5234#appendix-B) of the ABNF spec for general use in grammars.
@@ -307,7 +304,13 @@ The definition of this extension below makes use of the rules defined in [Sectio
 ```ruby
 any-character = num-val / char-val
 negated-character-group =
-    "!(" *c-wsp any-character *c-wsp *( "/" *c-wsp any-character ) *c-wsp ")"
+    "!("
+        *c-wsp
+        any-character
+        *c-wsp
+        *( "/" *c-wsp any-character )
+        *c-wsp
+    ")"
 ```
 
 This enables you to write `!( "'" )` to mean any character except for a single quote.
@@ -330,13 +333,22 @@ The above rules also require a few supplemental rules that do not appear elsewhe
 ```ruby
 DOUBLE_QUOTED_STRING = %x22 *( !(%x22) ) %x22
 BACKTICK_STRING = "`" *( !("`") ) "`"
-QUOTED_STRING = SINGLE_QUOTED_STRING / DOUBLE_QUOTED_STRING / BACKTICK_STRING
+
+QUOTED_STRING = SINGLE_QUOTED_STRING
+QUOTED_STRING =/ DOUBLE_QUOTED_STRING
+QUOTED_STRING =/ BACKTICK_STRING
 
 NOT_QUOTE_OR_PAREN = !( "'" / %x22 / "`" / "(" / ")" )
 MATCHING_PARENS_SEGMENT =
-    "(" *( QUOTED_STRING / MATCHING_PARENS_SEGMENT / *NOT_QUOTE_OR_PAREN ) ")"
+    "(" *(
+        QUOTED_STRING
+        / MATCHING_PARENS_SEGMENT
+        / *NOT_QUOTE_OR_PAREN
+    ) ")"
 
-ANY_SEQUENCE = MATCHING_PARENS_SEGMENT / QUOTED_STRING / NOT_QUOTE_OR_PAREN
+ANY_SEQUENCE = MATCHING_PARENS_SEGMENT
+ANY_SEQUENCE =/ QUOTED_STRING
+ANY_SEQUENCE =/ NOT_QUOTE_OR_PAREN
 
 ARGUMENT_NON_SPECIAL = !( "'" / %x22 / "`" / "(" / ")" / "," )
 ARGUMENT = *(

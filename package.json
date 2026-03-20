@@ -16,7 +16,6 @@
     "@next/mdx": "*",
     "@stefanprobst/rehype-extract-toc": "^3.0.0",
     "@tailwindcss/postcss": "^4.2.1",
-    "@tailwindcss/typography": "^0.5.19",
     "@viz-js/viz": "^3.24.0",
     "classnames": "^2.5.1",
     "hast-util-to-jsx-runtime": "^2.3.6",

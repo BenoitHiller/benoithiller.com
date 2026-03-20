@@ -29,8 +29,8 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
           </nav>
         </div>
       </header>
-      <section className="pt-14 min-h-dvh container mx-auto">
-        <div className="max-md:max-w-dvw">{children}</div>
+      <section className="pt-14 min-h-dvh container mx-auto max-lg:w-min">
+        <div className="max-xl:max-w-dvw">{children}</div>
       </section>
     </>
   );

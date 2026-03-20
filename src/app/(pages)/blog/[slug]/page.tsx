@@ -36,10 +36,9 @@ async function Page({ params }: PageProps<'/blog/[slug]'>) {
         <TableOfContents className="fixed" entries={tableOfContents} />
       </TwoColumns.Left>
       <TwoColumns.Right Element="article">
-        <div className="prose">
+        <div className="prose max-md:w-full">
           <h1>{title ?? slug}</h1>
           <Component />
-          <hr className="mt-10 mb-8" />
         </div>
         <Footer post={post} />
       </TwoColumns.Right>

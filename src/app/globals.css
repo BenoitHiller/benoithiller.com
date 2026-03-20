@@ -1,53 +1,121 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
 
 @theme inline {
   --font-sans: var(--font-mplus), sans serif;
   --font-mono: var(--font-cascadia), monospace;
+
+  --color-body-text: var(--color-gray-700);
+  --color-dark-text: var(--color-gray-800);
+  --color-header-text: var(--color-gray-900);
 }
 
 .prose {
-  /* lighten the code text a bit to match because we adjusted the font-size */
-  --tw-prose-code: var(--color-gray-800);
-  --tw-prose-quotes: var(--color-gray-700);
+  max-width: 65ch;
+
   font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+
+  color: var(--color-body-text);
+}
+
+@scope (.prose) to (.not-prose) {
+  a {
+    font-weight: 500;
+    text-decoration: underline;
+    color: var(--color-dark-text);
+  }
 
   pre code {
     line-height: 19px;
+    color: inherit;
   }
 
   code {
-    /* Override the code that sets the code font size smaller because it makes
-     * things look misaligned */
     font-size: 16px;
     font-weight: 400;
-    /* Disable automatically adding backticks to inline code */
-    &::after, &::before {
-      content: unset;
+    color: var(--color-dark-text);
+  }
+
+  li {
+    @apply my-2;
+  }
+
+  ol {
+    list-style: decimal;
+    --marker-color: var(--color-dark-text);
+  }
+
+  ul {
+    list-style-type: disc;
+    --marker-color: var(--color-gray-300);
+  }
+
+  ol, ul {
+    padding-inline-start: --spacing(6);
+
+    > li {
+      padding-inline-start: --spacing(1);
+
+      &::marker {
+        font-weight: 400;
+        color: var(--marker-color);
+      }
     }
   }
 
-  :where(p):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
-    margin-top: --spacing(5);
-    margin-bottom: --spacing(3);
+  p, ol, ul {
+    @apply prose-spacing
   }
 
   blockquote {
     font-style: unset;
-    p:first-of-type::before,
-    p:last-of-type::after {
-      /* I don't know why they would think putting the quotes in looks nice when they are drawing
-       * the left hand border as well. */
-      content: unset;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-header-text);
+
+    a {
+      color: inherit;
+      font-weight: inherit;
+      text-decoration: inherit;
     }
   }
 
-  p + .heading-h3 {
-    margin-top: --spacing(3);
+  h1 {
+    @apply text-4xl;
+    @apply mb-8;
+
+    font-weight: 800;
   }
 
-  .info-box + .info-box {
+  h2 {
+    @apply text-2xl;
+
+    font-weight: 800;
+  }
+
+  h3 {
+    @apply text-xl;
+
+    font-weight: 600;
+  }
+
+  h4 {
+    font-weight: 600;
+  }
+
+  dt {
+    color: var(--color-header-text);
+    font-weight: 600;
     margin-top: 0;
+  }
+
+  dd {
+    @apply vertical-margin-between-3;
+
+    margin-top: --spacing(2);
+    padding-inline-start: --spacing(5);
   }
 }
 
@@ -68,7 +136,7 @@
 }
 
 @utility expand-to-edge {
-  @apply max-md:expand-l-6 max-md:expand-r-6 md:expand-l-8 md:expand-r-10
+  @apply max-lg:expand-l-6 max-lg:expand-r-6 lg:expand-l-8 lg:expand-r-10
 }
 
 @utility -wplus-* {
@@ -77,4 +145,18 @@
 
 @utility wplus-* {
   width: calc(100% + --spacing(--value(integer)));
+}
+
+@utility prose-spacing {
+  @apply vertical-margin-between-5;
+}
+
+@utility vertical-margin-between-* {
+  &:not(:last-child) {
+    margin-bottom: --spacing(--value(integer));
+  }
+}
+
+.collapse-after + .collapse-before {
+  margin-top: --spacing(-5);
 }
