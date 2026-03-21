@@ -104,6 +104,7 @@ const Code: React.FC<{ code: string; lang: string }> = async ({ code, lang }) =>
       pre: (props) => (
         <pre
           {...props}
+          tabIndex={undefined}
           className="expand-to-edge max-md:py-6 md:py-8 overflow-x-auto pr-8 prose-spacing collapse-before"
         />
       ),
