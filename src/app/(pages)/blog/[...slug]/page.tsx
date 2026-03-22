@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 
-import path from 'path';
 import TableOfContents from './TableOfContents';
 import Footer from './Footer';
 import * as TwoColumns from '@/components/TwoColumns';
@@ -12,10 +11,10 @@ export const dynamicParams = false;
 async function generateStaticParams() {
   const paths = await blogDb.listFiles();
 
-  return paths.map((entry) => ({ slug: path.parse(entry).name }));
+  return paths.map((entry) => ({ slug: entry.split('/') }));
 }
 
-async function generateMetadata({ params }: PageProps<'/blog/[slug]'>): Promise<Metadata> {
+async function generateMetadata({ params }: PageProps<'/blog/[...slug]'>): Promise<Metadata> {
   const { slug } = await params;
   const { title, description } = await blogDb.get(slug);
 
@@ -25,7 +24,7 @@ async function generateMetadata({ params }: PageProps<'/blog/[slug]'>): Promise<
   };
 }
 
-async function Page({ params }: PageProps<'/blog/[slug]'>) {
+async function Page({ params }: PageProps<'/blog/[...slug]'>) {
   const { slug } = await params;
   const post = await blogDb.get(slug);
   const { Component, title, tableOfContents } = post;
@@ -37,7 +36,7 @@ async function Page({ params }: PageProps<'/blog/[slug]'>) {
       </TwoColumns.Left>
       <TwoColumns.Right Element="article">
         <div className="prose max-md:w-full">
-          <h1>{title ?? slug}</h1>
+          <h1>{title ?? slug.join('/')}</h1>
           <Component />
         </div>
         <Footer post={post} />

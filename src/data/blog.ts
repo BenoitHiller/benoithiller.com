@@ -1,9 +1,11 @@
 import { cache } from 'react';
 import fs from 'fs/promises';
+import type { Dirent } from 'fs';
 import path from 'path';
 import type { Toc } from '@stefanprobst/rehype-extract-toc';
 import git from 'isomorphic-git';
 import * as R from 'ramda';
+import * as RA from 'ramda-adjunct';
 
 /**
  * Metadata object exported inside the post pages.
@@ -44,28 +46,33 @@ interface BlogImport {
  * List the filenames for each blog entry in the order returned by fs.readdir.
  */
 const listFiles = cache(async () => {
-  return await fs.readdir(process.env.blogPath!);
+  async function* iterator() {
+    for await (const entry of fs.glob('**/*.mdx', { cwd: process.env.blogPath! })) {
+      yield entry.replace(/\.mdx$/, '');
+    }
+  }
+  return await Array.fromAsync(iterator());
 });
 
 /**
  * Helper to import a blog page by slug and to cast it into the BlogImport type.
  */
-const importPost: (slug: string) => Promise<BlogImport> = async (slug) =>
-  await import(`@/blog/${slug}.mdx`);
+const importPost: (slugPath: string) => Promise<BlogImport> = async (slugPath) =>
+  await import(`@/blog/${slugPath}.mdx`);
 
 /**
  * Get the full BlogPost object for a given blog page
- * @param {string} slug - the slug of the blog page to fetch.
  */
-const get: (slug: string) => Promise<BlogPost> = cache(async (slug) => {
-  const { default: Component, metadata, tableOfContents } = await importPost(slug);
+const get: (slug: string[] | string) => Promise<BlogPost> = cache(async (slug) => {
+  const slugPath = typeof slug === 'string' ? slug : slug.join('/');
+  const { default: Component, metadata, tableOfContents } = await importPost(slugPath);
 
   const { title, description, publishedAt } = metadata ?? {};
 
   // For drafts skip looking them up in git.
-  if (slug.endsWith('.draft')) {
+  if (slugPath.startsWith('drafts/')) {
     return {
-      slug,
+      slug: slugPath,
       title,
       description,
       Component,
@@ -73,7 +80,7 @@ const get: (slug: string) => Promise<BlogPost> = cache(async (slug) => {
     };
   }
 
-  const filepath = path.join(process.env.blogPath!, `${slug}.mdx`);
+  const filepath = path.join(process.env.blogPath!, `${slugPath}.mdx`);
   const gitRoot = process.env.rootPath!;
   const relativePath = path.relative(gitRoot, filepath);
 
@@ -97,7 +104,7 @@ const get: (slug: string) => Promise<BlogPost> = cache(async (slug) => {
   }
 
   return {
-    slug,
+    slug: slugPath,
     title,
     description,
     Component,
@@ -113,9 +120,7 @@ const get: (slug: string) => Promise<BlogPost> = cache(async (slug) => {
 const list: () => Promise<BlogPost[]> = cache(async () => {
   const paths = await listFiles();
   const postPromises = paths.map(async (entry) => {
-    const slug = path.parse(entry).name;
-
-    return get(slug);
+    return get(entry);
   });
 
   const posts = await Promise.all(postPromises);

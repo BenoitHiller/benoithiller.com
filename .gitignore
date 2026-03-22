@@ -40,3 +40,4 @@ next-env.d.ts
 
 # development
 /src/blog/*.draft.*
+/src/blog/drafts
