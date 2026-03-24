@@ -119,6 +119,16 @@
   }
 }
 
+.collapse-after + .collapse-before {
+  margin-top: --spacing(-5);
+}
+
+.invisible-link {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: inherit;
+}
+
 @utility svg-stroke-* {
   polygon {
     stroke: --value(--color-*);
@@ -155,8 +165,4 @@
   &:not(:last-child) {
     margin-bottom: --spacing(--value(integer));
   }
-}
-
-.collapse-after + .collapse-before {
-  margin-top: --spacing(-5);
 }
