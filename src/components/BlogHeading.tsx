@@ -7,7 +7,8 @@ const BlogHeading: React.FC<{
   id?: string;
   children: React.ReactNode;
   href?: string;
-}> = ({ children, id, Component, className = '', href }) => {
+  border?: boolean;
+}> = ({ children, id, Component, className = '', href, border = true }) => {
   let content = children;
 
   if (href) {
@@ -22,7 +23,7 @@ const BlogHeading: React.FC<{
 
   return (
     <div
-      className={`heading heading-${Component} prose-spacing collapse-after expand-to-edge max-lg:wplus-12 lg:wplus-18 ${className} border-b-1 border-b-gray-950/5`}
+      className={`heading heading-${Component} prose-spacing collapse-after expand-to-edge max-lg:wplus-12 lg:wplus-18 ${className} ${border ? 'border-b-1 border-b-gray-950/5' : ''}`}
     >
       {content}
     </div>
@@ -38,6 +39,9 @@ const H3: HeadingComponent = (props) => (
 const H4: HeadingComponent = (props) => (
   <BlogHeading Component="h4" className="pb-4 mt-5" {...props} />
 );
+const H5: HeadingComponent = (props) => (
+  <BlogHeading Component="h5" className="mt-5" border={false} {...props} />
+);
 
-export { H2, H3, H4 };
+export { H2, H3, H4, H5 };
 export default BlogHeading;

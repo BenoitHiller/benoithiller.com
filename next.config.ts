@@ -42,7 +42,8 @@ const withMDX = createMDX({
     // match here to resolve the issue.
     //
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    rehypePlugins: rehypePlugins as any
+    rehypePlugins: rehypePlugins as any,
+    remarkPlugins: ['remark-gfm']
   }
 });
 

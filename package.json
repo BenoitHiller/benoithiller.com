@@ -29,6 +29,8 @@
     "react-syntax-highlighter": "^16.1.1",
     "rehype-mdx-code-props": "^3.0.1",
     "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-gfm-tables": "link:src/remark-gfm-tables",
     "rss": "^1.2.2",
     "shiki": "^4.0.2",
     "tailwindcss": "^4.2.1",
@@ -36,6 +38,7 @@
   },
   "devDependencies": {
     "@types/lodash.debounce": "^4.0.9",
+    "@types/mdast": "^4.0.4",
     "@types/mdx": "^2.0.13",
     "@types/node": "^25.5.0",
     "@types/ramda": "^0.30.2",
