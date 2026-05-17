@@ -5,15 +5,15 @@ type ThemeColors = NonNullable<ThemeRegistration['tokenColors']>;
 // I've copied in the full palette from my vim theme, but some colors aren't
 // used here yet.
 const Black = '#252525';
-// const DarkRed = '#C73205';
-// const DarkGreen = '#58AD06';
+const DarkRed = '#C73205';
+const DarkGreen = '#58AD06';
 const DarkYellow = '#C77920';
 const DarkBlue = '#5FD7FF';
-// const DarkMagenta = '#7C5283';
-// const DarkCyan = '#238789';
-// const Gray = '#B6BEB1';
+const DarkMagenta = '#7C5283';
+const DarkCyan = '#238789';
+const Gray = '#B6BEB1';
 const DarkGray = '#8C8C8C';
-// const Red = '#EF5858';
+const Red = '#EF5858';
 const Green = '#A6E964';
 const Yellow = '#F0D25E';
 const Blue = '#95B3D4';
@@ -171,7 +171,23 @@ const theme: ThemeRegistration = {
     // I don't believe there is anything as smart as the reverse behaviour in
     // vim available, so comments are currently the same color which is less
     // than ideal.
-    'editor.selectionBackground': DarkGray
+    'editor.selectionBackground': DarkGray,
+    'terminal.ansiBlack': Black,
+    'terminal.ansiRed': DarkRed,
+    'terminal.ansiGreen': DarkGreen,
+    'terminal.ansiYellow': DarkYellow,
+    'terminal.ansiBlue': DarkBlue,
+    'terminal.ansiMagenta': DarkMagenta,
+    'terminal.ansiCyan': DarkCyan,
+    'terminal.ansiWhite': Gray,
+    'terminal.ansiBrightBlack': DarkGray,
+    'terminal.ansiBrightRed': Red,
+    'terminal.ansiBrightGreen': Green,
+    'terminal.ansiBrightYellow': Yellow,
+    'terminal.ansiBrightBlue': Blue,
+    'terminal.ansiBrightMagenta': Magenta,
+    'terminal.ansiBrightCyan': Cyan,
+    'terminal.ansiBrightWhite': White
   }
 };
 
