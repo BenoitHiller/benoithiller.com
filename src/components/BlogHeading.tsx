@@ -23,7 +23,7 @@ const BlogHeading: React.FC<{
 
   return (
     <div
-      className={`heading heading-${Component} prose-spacing collapse-after expand-to-edge max-lg:wplus-12 lg:wplus-18 ${className} ${border ? 'border-b-1 border-b-gray-950/5' : ''}`}
+      className={`heading heading-${Component} collapse-before expand-to-edge max-lg:wplus-12 lg:wplus-18 ${className} ${border ? 'border-t-1 border-t-gray-950/5' : ''}`}
     >
       {content}
     </div>
@@ -31,16 +31,16 @@ const BlogHeading: React.FC<{
 };
 
 const H2: HeadingComponent = (props) => (
-  <BlogHeading Component="h2" className="pb-5 mt-5 mb-7" {...props} />
+  <BlogHeading Component="h2" className="pt-8 mt-9 mb-7" {...props} />
 );
 const H3: HeadingComponent = (props) => (
-  <BlogHeading Component="h3" className="pb-4 mt-5" {...props} />
+  <BlogHeading Component="h3" className="pt-6 mt-7 mb-5" {...props} />
 );
 const H4: HeadingComponent = (props) => (
-  <BlogHeading Component="h4" className="pb-4 mt-5" {...props} />
+  <BlogHeading Component="h4" className="pt-5 mt-7 mb-5" {...props} />
 );
 const H5: HeadingComponent = (props) => (
-  <BlogHeading Component="h5" className="mt-5" border={false} {...props} />
+  <BlogHeading Component="h5" className="pt-5 mt-7 mb-5" border={false} {...props} />
 );
 
 export { H2, H3, H4, H5 };

@@ -1,14 +1,13 @@
 import PostList from '@/components/BlogPostList';
 import Card from '@/components/Card';
 import * as TwoColumns from '@/components/TwoColumns';
-import Link from 'next/link';
 import { H2 } from '@/components/BlogHeading';
 
 async function Page() {
   return (
     <TwoColumns.Layout>
       <TwoColumns.Left className="prose pr-6 lg:w-lg">
-        <h2>About</h2>
+        <H2>About</H2>
         <p>This is Benoit Hiller's personal portfolio website and and blog.</p>
         <p>
           I've selected a few samples of my recent work available on GitHub in the Portfolio
