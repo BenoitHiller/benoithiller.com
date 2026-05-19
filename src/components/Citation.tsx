@@ -7,6 +7,9 @@ import React from 'react';
  * The individual items in the bibliography are defined using React components with props that
  * mirror those used in BibTex.
  *
+ * Style guide:
+ *   https://docs.google.com/document/d/1j1L96U2NagwWI9MEVDNVKt9pXxRzTH7h3krI3Mb6wZE/edit?tab=t.0
+ *
  * Note: there is one major place where the output deviates from IEEE, which is that while urls are
  * not styled as being hyperlinked they are still linked. As having the links not work for no reason
  * on a website would be obnoxious.
@@ -118,7 +121,7 @@ interface ArticleProps {
 const Article: React.FC<ArticleProps> = (props) => {
   const writer = new CitationWriter(props);
   writer.format('author', '%s,');
-  writer.format('title', '"%s",');
+  writer.format('title', '"%s,"');
   writer.format('journal', '%italic,');
   writer.format('volume', 'vol. %s,');
   writer.format('number', 'no. %s,');
@@ -203,4 +206,36 @@ const Book: React.FC<BookProps> = (props) => {
   return writer.render();
 };
 
-export { Article, Blog, Book, LectureNotes };
+interface MastersThesisProps {
+  author: string;
+  title: string;
+  year: string;
+  school: string;
+  country?: string;
+  state?: string;
+  city?: string;
+  month?: string;
+  day?: string;
+  url?: string;
+}
+
+const MastersThesis: React.FC<MastersThesisProps> = (props) => {
+  const writer = new CitationWriter(props);
+
+  writer.format('author', '%s,');
+  writer.format('title', '"%s,"');
+  writer.write(' M.S. Thesis,');
+  writer.format('school', '%s,');
+  writer.format('city', '%s,');
+  writer.format('state', '%s,');
+  writer.format('country', '%s,');
+  writer.format('month', '%s,');
+  writer.format('day', '%s,');
+  writer.format('year', '%s');
+  writer.write('.');
+  writer.format('url', '[Online]. Available: %url');
+
+  return writer.render();
+};
+
+export { Article, Blog, Book, LectureNotes, MastersThesis };
