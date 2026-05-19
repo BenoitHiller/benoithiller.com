@@ -1,0 +1,240 @@
+import { Info, Note, Warning } from '@/components/Info';
+
+export const metadata = {
+  title: 'git Tips and Tricks',
+  description: 'Some tips to help you use git more effectively and avoid common problems.',
+  publishedAt: new Date("2025-05-19T12:40:00-04:00")
+}
+
+Over the years I've spent a lot of time helping other developers fix problems they created using git. I wanted to take the time to document a few tips that can help you avoid creating those problems in the first place.
+
+## Don't Click "Update branch"
+
+I put this first because if I don't warn people early they make this mistake more often than not.
+
+![Update branch button](/images/pull-request-update-branch-rebase-option.webp)
+
+Updating a branch isn't really so simple that you can do it with a click of a button. If you don't know exactly what the button is about to do, clicking it is going to make a mess.
+
+<Warning>
+The default *Update with merge commit* option will leave you with a history that you won't be allowed to merge in unless the repository you are on is using a very particular git workflow.
+
+Having this as the default behaviour of the button, rather than an optional behaviour requiring a separate opt-in from maintainers, is an unfortunate mistake on GitHub's part.
+</Warning>
+<Note>
+The *Update with rebase* option will do something very similar to running `git pull --rebase` yourself then force-pushing back up.
+
+As long as you understand how to handle the complications with pulling code back down after GitHub does a forced update to the branch, then you can use this options without issues.
+</Note>
+
+## Check Your git Version
+
+The core features of git are relatively stable, so a lot of the recent changes focus on making it easier to use. You definitely want those improvements.
+
+If you haven't updated in a while, or if you are on OSX and are using the version of git that comes with XCode, then you could be years out of date.
+
+<Info>
+For reference:
+* `v2.53.0` was released Feb 01 2026
+* `v2.47.0` was released Jan 10 2025
+* `v2.44.0` was released Feb 22 2024
+</Info>
+
+## Look at your Tree
+
+The history of a codebase is a big complicated thing, to the point where there is no single nice way to visualize it all at once.
+
+Instead the idea with git is that you use the command line to run queries and get nice visualizations of subsets of that information as needed.
+
+The problem is that **you have to actually do the queries unless you want to stumble around in the dark.**
+
+### git log
+
+The `git log` command actually provides a decent way to see what your git history looks like.
+
+```ansi
+[1m[94mbhiller[22m[39m@ubuntu [1m~/src/tree[22m % git log --graph --oneline main feature_1
+* [33m8abdf4b ([1m[32mmain[22m[33m)[39m Set version 1.1
+* [33m6037b94[39m Merge feature_2[31m
+|[39m * [33mb3a423b ([1m[36mHEAD[22m[33m -> [1m[32mfeature_1[22m[33m)[39m Add change 2[31m
+|[39m * [33m2c492b7[39m Add change 1[31m
+|/[39m
+* [33ma60d9c4[39m Set version 1.0
+* [33m4c717fa[39m Initialize repository[0m
+```
+
+<Info>
+The `--graph` option asks `git log` to lay out the commits as a graph, drawing lines to indicate parents.
+
+The `--oneline` option asks `git log` to give you a very minimal representation of each line.
+
+The `main` and `feature_1` arguments tell it to include every commit reachable from either `main` or `feature_1`.
+</Info>
+
+The point of reviewing your history as a graph this way is that it will enable you to visualize what a merge or rebase will actually do.
+
+The example I've shown above is a simple one, but if what you see isn't comprehensible then there is a decent chance you've already made a mess of your branch and need to fix that before trying to move forward with more changes.
+
+### GUI tools
+
+I like `git log`, and it has a lot of additional power to filter the output or change how it is rendered, but if you find it hard to read there are plenty of nice history viewers out there.
+
+A full git install will provide a somewhat ugly looking one that you can access with the `gitk` command.
+
+![gitk showing the same tree as the command above](/images/gitk.png)
+
+The official git website has [a comprehensive list](https://git-scm.com/tools/guis) of prettier options.
+
+## Don't use git pull
+
+When you use `git pull` to pull remote changes git does two separate things:
+
+1. It uses `git fetch` to download the changes into a remote tracking branch
+2. It then updates whatever branch you are currently on with those changes, doing a merge by default
+
+The issue with this being that your are taking whatever the server gives you and, without looking at it, trying to combine it into your local changes.
+
+### Use git fetch
+
+You can simply use `git fetch` yourself and save a lot of headache. Then you just need to know where fetch puts the content it fetched and you can do a merge or rebase yourself.
+
+```ansi
+[1m[94mbhiller[22m[39m@ubuntu [1m~/src/tree[22m % git fetch origin main
+From github.com:BenoitHiller/tree
+ * branch            main       -> FETCH_HEAD
+ * [new branch]      main       -> origin/main[0m
+```
+
+In the output when fetching it shows you where it placed the things it fetched. In the above it is telling you that the content of `main` from `origin` was placed into the remote tracking branch `origin/main` as well as the ref `FETCH_HEAD`.
+
+You can then have a look at what is actually in fetched branch and decide what to do next.
+
+Even if you are going to rebase your work on top regardless, it is helpful to get an idea whether that rebase is going to be a trivial matter or if you are going to be stuck dealing with it for hours.
+
+## Rebase Interactively
+
+I highly recommend using the interactive mode `git rebase -i` every single time.
+
+The reasoning for this is mostly because it provides a sanity check of what you are about to do before you spend time working through the rebase.
+
+`git rebase` uses simple rules to figure out what commits to try and use, so there are some common situations where it will pick up things that you really don't want and in the process produce awful conflicts or silently break things.
+
+### What's an Interactive Rebase
+
+When you do a rebase git does the following:
+
+1. It makes a list of all of the commits that are in the current branch but not in the target.
+2. It saves those commits to a TODO file in order from oldest to newest.
+3. It then switches to a detached head (basically a temporary branch) that starts at the latest commit in the target
+4. It goes through the lines in the TODO file one by one, cherry-picking them in order and removing the lines from the file until it is empty.
+5. When it is done it takes the branch you started on, and updates it to point at the detached head.
+
+When you do an interactive rebase it shows you that TODO file and lets your edit it before starting.
+
+<Info>
+The `git cherry-pick` command turns the specified commit(s) into patches then tries to apply them to your current branch. This is the cherry-picking mentioned above.
+</Info>
+<Note>
+I've glossed over some details here for the sake of simplicity. Like you can actually specify what commits it moves and where it puts them separately.
+
+Also the TODO list is capable of all sorts of wacky things. By default it is populated with a bunch of `pick` commands but git tells you all kinds of other commands you could do in a big comment at the bottom. It is like a simple scripting language.
+</Note>
+
+### Working Through an Example
+
+If you are working on a change that is based off of un-merged work you may find yourself in the following situation when the branch you forked off of gets updated.
+
+So for example if you start working on `feature_3` based on `feature_1` from before you could have a tree like the following:
+
+```ansi
+[1m[94mbhiller[22m[39m@ubuntu [1m~/src/tree[22m % git log --graph --oneline main feature_3
+* [33m3dc071e ([1m[32mmain[22m[33m)[39m Set version 1.1
+* [33mdd2fda5[39m Merge feature_2[31m
+|[39m * [33mc6d66d2 ([1m[36mHEAD[22m[33m -> [1m[32mfeature_3[22m[33m)[39m Add change 3_1[31m
+|[39m * [33mb3a423b ([1m[32mfeature_1[22m[33m)[39m Add change 2[31m
+|[39m * [33m2c492b7[39m Add change 1[31m
+|/[39m
+* [33ma60d9c4[39m Set version 1.0
+* [33m4c717fa[39m Initialize repository[0m
+```
+
+If `feature_1` gets rebased based on the latest main you will end up with the following situation:
+
+```ansi
+[1m[94mbhiller[22m[39m@ubuntu [1m~/src/tree[22m % git log --graph --oneline feature_1 HEAD
+* [33m7242394 ([1m[32mfeature_1[22m[33m)[39m Add change 2
+* [33m428c44f[39m Add change 1
+* [33m3dc071e ([1m[32mmain[22m[33m)[39m Set version 1.1
+* [33mdd2fda5[39m Merge feature_2[31m
+|[39m * [33mc6d66d2 ([1m[36mHEAD[22m[33m -> [1m[32mfeature_3[22m[33m)[39m Add change 3_1[31m
+|[39m * [33mb3a423b[39m Add change 2[31m
+|[39m * [33m2c492b7[39m Add change 1[31m
+|/[39m
+* [33ma60d9c4[39m Set version 1.0
+* [33m4c717fa[39m Initialize repository[0m
+```
+
+Notice how their are now two copies of the `Add change 1` and `Add change 2` commits.
+
+This can cause a problem when you try to rebase, as if it tries to re-apply the commits they are very likely to have conflicts with themselves that you will be forced to resolve.
+
+<Note>
+git does try to help you avoid this particular problem by identifying commits with identical contents, but if `feature_1` needed to resolve conflicts when they rebased then the commits are no longer identical.
+
+Sadly even tiny conflicts, like those which git can automatically resolve, do make the commits different so you will rarely get so lucky.
+</Note>
+
+The solution to this problem is to look at the list of commits in the interactive rebase TODO list, and delete the things that shouldn't be there.
+
+If you are rebasing a feature branch that you wrote, the only commits that should be getting rebased are the ones you wrote specifically for that feature. Everything else shouldn't be in there.
+
+```ansi
+[38;5;242m[40m  1 [93mpick[97m [96m2c492b7[92m Add change 1[38;5;242m
+  2 [93mpick[97m [96mb3a423b[92m Add change 2[38;5;242m
+  3 [93mpick[97m [96mc6d66d2[92m Add change 3_1[38;5;242m
+  4
+  5 # Rebase [96m7242394[38;5;242m..[96mc6d66d2[38;5;242m onto [96m7242394[38;5;242m (3 commands)
+```
+
+When doing the rebase described above you would want to delete the first two lines in this rebase TODO list because you know they aren't a part of the changes you wrote for `feature_3`.
+
+<Note>
+If the rebase TODO list opens up and it's an incomprehensible disaster you probably want to cancel the rebase without doing anything so you can look into what went wrong.
+
+Cancelling a rebase at that point is the same as cancelling a commit, just delete all the lines in the file, then save and close it.
+</Note>
+
+### Improving the Rebase TODO
+
+I highly recommend configuring the following setting in your `.gitconfig`.
+
+```ini
+[rebase]
+  instructionFormat = "(%an <%ae>) %s"
+```
+
+This will add in the name of the person who made each commit into the TODO list. As usually your feature branch is composed only of things you wrote and you can drop the commits with a different author.
+
+### Set your git Editor
+
+If you're not a vim user please change the `core.editor` setting to something you actually enjoy using.
+
+It is easy to end up subconsciously avoiding git commands that open an editor simply because you find vim frustrating.
+
+If you are using VSCode you can put the following in your `.gitconfig`.
+
+```ini
+[core]
+  editor = "code --wait"
+```
+<Note>
+The `--wait` is because git operations that use an editor determine if you are done by checking when the command finishes. If you run `code` without the `--wait` it returns immediately which means you don't get a chance to actually edit anything.
+</Note>
+
+## Conclusion
+
+So those are a few of my own tips for people still getting used to git. I mostly tried to focus on topics that I don't see talked about that often, as there are plenty of great articles out there on things like helpful aliases or config settings.
+
+I wanted to talk a bit about `git diff`, but it is so immensely useful in so many different ways that it doesn't form a single concise tip. The advice I've given about inspecting the tree tells you the shape of the history, `git diff` is what you should be using to find out the contents of the history.
+
+I hope these tips help you to feel a bit more comfortable working with git.
