@@ -36,7 +36,6 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "src/remark-gfm-tables"
+    "node_modules"
   ]
 }
