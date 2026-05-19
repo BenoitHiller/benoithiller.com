@@ -4,6 +4,7 @@
   --font-sans: var(--font-mplus), sans serif;
   --font-mono: var(--font-cascadia), monospace;
 
+  --color-body-background: hsl(210, 40%, 99%);;
   --color-body-text: var(--color-gray-700);
   --color-dark-text: var(--color-gray-800);
   --color-header-text: var(--color-gray-900);

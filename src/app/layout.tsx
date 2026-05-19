@@ -31,7 +31,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <head>
           <FontFallbackDefinition />
         </head>
-        <body>{children}</body>
+        <body className="bg-body-background">{children}</body>
       </html>
     </ClientContext>
   );

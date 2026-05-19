@@ -12,7 +12,7 @@ const Card: React.FC<{
   children: React.ReactNode;
 }> = ({ title, subTitle, tags, href, children }) => {
   return (
-    <div className="px-4 py-6 mb-6 rounded-md border border-gray-300">
+    <div className="px-4 py-6 mb-6 bg-white rounded-md border border-gray-300">
       <Link href={href}>{title}</Link>
       {subTitle && <div className="text-gray-500 text-xs font-light">{subTitle}</div>}
       <p className="mt-3">{children}</p>
