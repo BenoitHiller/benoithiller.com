@@ -7,10 +7,11 @@ type ThemeColors = NonNullable<ThemeRegistration['tokenColors']>;
 const Black = '#252525';
 const DarkRed = '#C73205';
 const DarkGreen = '#58AD06';
-const DarkYellow = '#C77920';
+const DarkYellow = '#C0751E';
 const DarkBlue = '#5FD7FF';
 const DarkMagenta = '#7C5283';
 const DarkCyan = '#238789';
+
 const Gray = '#B6BEB1';
 const DarkGray = '#8C8C8C';
 const Red = '#EF5858';
