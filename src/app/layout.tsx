@@ -4,6 +4,7 @@ import '@/app/globals.css';
 import { metadataBase } from '@/sharedMetadata';
 import ClientContext from '@/components/ClientContext';
 import Link from 'next/link';
+import Script from 'next/script';
 import { M_PLUS_2, Cascadia_Code } from 'next/font/google';
 
 export const metadata: Metadata = {
@@ -58,6 +59,7 @@ export default function Layout({
           <section className="non-printable pt-14 min-h-dvh container mx-auto max-lg:w-min">
             <div className="max-xl:max-w-dvw">{children}</div>
           </section>
+          <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
         </body>
       </html>
     </ClientContext>
