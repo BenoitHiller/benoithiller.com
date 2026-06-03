@@ -66,20 +66,20 @@ The `git log` command actually provides a decent way to see what your git histor
 <Info>
 The `--graph` option asks `git log` to lay out the commits as a graph, drawing lines to indicate parents.
 
-The `--oneline` option asks `git log` to give you a very minimal representation of each line.
+The `--oneline` option asks `git log` to give you a very minimal representation of each commit.
 
 The `main` and `feature_1` arguments tell it to include every commit reachable from either `main` or `feature_1`.
 </Info>
 
-The point of reviewing your history as a graph this way is that it will enable you to visualize what a merge or rebase will actually do.
+The point of reviewing your history as a graph this way is to visualize what a merge or rebase will actually do.
 
-The example I've shown above is a simple one, but if what you see isn't comprehensible then there is a decent chance you've already made a mess of your branch and need to fix that before trying to move forward with more changes.
+The example output I've shown above is pretty simple, but if what you see is huge and incomprehensible then there is a decent chance you've already made a mess of your branch and need to fix that before trying to move forward with more changes.
 
 ### GUI tools
 
-I like `git log`, and it has a lot of additional power to filter the output or change how it is rendered, but if you find it hard to read there are plenty of nice history viewers out there.
+While I like `git log`, and it has a lot of additional power to filter the output or change how it is rendered, if you find it hard to read there are plenty of nice history viewers out there.
 
-A full git install will provide a somewhat ugly looking one that you can access with the `gitk` command.
+A full git install will provide a somewhat ugly looking one that you can access by running `gitk` in the terminal.
 
 ![gitk showing the same tree as the command above](/images/gitk.png)
 
