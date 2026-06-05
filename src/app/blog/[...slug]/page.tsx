@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import 'katex/dist/katex.min.css';
 
 import TableOfContents from './TableOfContents';
 import Footer from './Footer';

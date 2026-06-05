@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
 
 const rehypePlugins = [
   ['rehype-slug'],
+  ['rehype-katex'],
   ['@stefanprobst/rehype-extract-toc'],
   ['@stefanprobst/rehype-extract-toc/mdx'],
   ['rehype-mdx-code-props']
@@ -43,7 +44,7 @@ const withMDX = createMDX({
     //
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rehypePlugins: rehypePlugins as any,
-    remarkPlugins: ['remark-gfm']
+    remarkPlugins: ['remark-gfm', 'remark-math']
   }
 });
 
