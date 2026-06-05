@@ -17,7 +17,7 @@
     "@mdx-js/react": "^3.1.1",
     "@next/mdx": "*",
     "@stefanprobst/rehype-extract-toc": "^3.0.0",
-    "@tailwindcss/postcss": "^4.2.1",
+    "@tailwindcss/postcss": "^4.3.0",
     "@viz-js/viz": "^3.24.0",
     "classnames": "^2.5.1",
     "hast-util-to-jsx-runtime": "^2.3.6",
@@ -37,7 +37,7 @@
     "remark-math": "^6.0.0",
     "rss": "^1.2.2",
     "shiki": "^4.0.2",
-    "tailwindcss": "^4.2.1",
+    "tailwindcss": "^4.3.0",
     "yaml-loader": "^0.8.1"
   },
   "devDependencies": {

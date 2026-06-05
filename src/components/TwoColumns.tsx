@@ -1,10 +1,19 @@
-const Left: React.FC<{ children: React.ReactNode; className?: string; hideable?: unknown }> = ({
-  children,
-  className,
-  hideable = false
-}) => (
+import classNames from 'classnames';
+
+const Left: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+  padding?: boolean;
+  hideable?: unknown;
+}> = ({ children, className, padding = true, hideable = false }) => (
   <section
-    className={`pt-6 justify-self-stretch ${hideable && 'max-lg:hidden'} lg:border-r border-gray-950/5 ${className}`}
+    className={classNames(
+      'justify-self-stretch',
+      'lg:border-r',
+      'border-gray-950/5',
+      { 'pt-6': padding, 'max-lg:hidden': hideable },
+      className
+    )}
   >
     {children}
   </section>
@@ -14,12 +23,12 @@ const Right: React.FC<{
   className?: string;
   Element?: React.ElementType;
 }> = ({ children, className, Element = 'section' }) => (
-  <Element className={`max-md:max-w-full pt-6 ${className}`}>{children}</Element>
+  <Element className={classNames('max-md:max-w-full pt-6', className)}>{children}</Element>
 );
 
 const Layout: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className
-}) => <div className={`flex max-lg:flex-col lg:gap-8 mx-6 ${className}`}>{children}</div>;
+}) => <div className={classNames('flex max-lg:flex-col lg:gap-8 mx-6', className)}>{children}</div>;
 
 export { Layout, Left, Right };

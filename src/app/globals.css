@@ -8,6 +8,7 @@
   --color-body-text: var(--color-gray-700);
   --color-dark-text: var(--color-gray-800);
   --color-header-text: var(--color-gray-900);
+  --value-dvh: 100dvh;
 }
 
 .prose {
@@ -162,6 +163,11 @@
 
 @utility wplus-* {
   width: calc(100% + --spacing(--value(integer)));
+}
+
+@utility max-h2-* {
+  max-height: calc(--value(number, percentage) - --spacing(--modifier(integer)));
+  max-height: calc(--value(--value) - --spacing(--modifier(integer)));
 }
 
 @utility prose-spacing {

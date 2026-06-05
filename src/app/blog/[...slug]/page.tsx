@@ -32,8 +32,11 @@ async function Page({ params }: PageProps<'/blog/[...slug]'>) {
 
   return (
     <TwoColumns.Layout>
-      <TwoColumns.Left className="w-64" hideable>
-        <TableOfContents className="fixed" entries={tableOfContents} />
+      <TwoColumns.Left className="w-64 max-h2-dvh/14" padding={false} hideable>
+        <TableOfContents
+          className="py-6 max-h2-100%/14 fixed scrollbar-thin overflow-y-auto"
+          entries={tableOfContents}
+        />
       </TwoColumns.Left>
       <TwoColumns.Right Element="article">
         <div className="prose max-md:w-full">
