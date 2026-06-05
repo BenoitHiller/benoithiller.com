@@ -14,7 +14,7 @@ const promise = instance();
 // it as 12 (to get scaled up to 16).
 const vizConfig: RenderOptions = {
   format: 'svg',
-  graphAttributes: { fontsize: 12 },
+  graphAttributes: { fontsize: 12, bgcolor: 'transparent' },
   nodeAttributes: { fontsize: 12, penwidth: 0.5 },
   edgeAttributes: { fontsize: 12, penwidth: 0.5 }
 };
@@ -25,7 +25,12 @@ const DotGraph: React.FC<{ children: string }> = ({ children }) => {
   if (svg.status === 'failure') {
     return <div>{svg.errors.map(({ level, message }) => `${level}: ${message}\n`)}</div>;
   } else {
-    return <figure className={styles.graph} dangerouslySetInnerHTML={{ __html: svg.output }} />;
+    return (
+      <figure
+        className={`prose-spacing ${styles.graph}`}
+        dangerouslySetInnerHTML={{ __html: svg.output }}
+      />
+    );
   }
 };
 
