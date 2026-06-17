@@ -13,23 +13,26 @@ const promise = instance();
 // That means for now if I want the text to match the body text I need to set
 // it as 12 (to get scaled up to 16).
 const vizConfig: RenderOptions = {
-  format: 'svg',
+  format: 'svg_inline',
   graphAttributes: { fontsize: 12, bgcolor: 'transparent' },
   nodeAttributes: { fontsize: 12, penwidth: 0.5 },
   edgeAttributes: { fontsize: 12, penwidth: 0.5 }
 };
 
-const DotGraph: React.FC<{ children: string }> = ({ children }) => {
+const DotGraph: React.FC<{ children: string; meta: { title?: string } }> = ({
+  children,
+  meta: { title }
+}) => {
   const viz = use(promise);
   const svg = viz.render(children, vizConfig);
   if (svg.status === 'failure') {
     return <div>{svg.errors.map(({ level, message }) => `${level}: ${message}\n`)}</div>;
   } else {
     return (
-      <figure
-        className={`prose-spacing ${styles.graph}`}
-        dangerouslySetInnerHTML={{ __html: svg.output }}
-      />
+      <figure className={`prose-spacing ${styles.graph}`}>
+        <div className="w-full *:w-full" dangerouslySetInnerHTML={{ __html: svg.output }} />
+        {title && <figcaption className="mt-3 text-center">{title}</figcaption>}
+      </figure>
     );
   }
 };
