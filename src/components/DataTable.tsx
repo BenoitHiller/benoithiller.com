@@ -1,18 +1,32 @@
 import React from 'react';
+import classNames from 'classnames';
 
 type HeadingGroup = [string, string[]];
 
-const Table: React.FC<React.ComponentPropsWithoutRef<'table'>> = (props) => (
-  <table className="border-collapse border border-gray-400" {...props} />
+const Table: React.FC<React.ComponentPropsWithoutRef<'table'> & { align?: 'left' | 'right' }> = ({
+  className,
+  align,
+  ...props
+}) => (
+  <table
+    className={classNames(
+      'border-collapse',
+      'border',
+      'border-gray-400',
+      className,
+      `text-${align ?? 'right'}`
+    )}
+    {...props}
+  />
 );
 const THead: React.FC<React.ComponentPropsWithoutRef<'thead'>> = (props) => (
-  <thead className="bg-gray-50" {...props} />
+  <thead className="bg-slate-100" {...props} />
 );
-const TH: React.FC<React.ComponentPropsWithoutRef<'th'>> = (props) => (
-  <th className="text-left p-3 border border-gray-300" {...props} />
+const TH: React.FC<React.ComponentPropsWithoutRef<'th'>> = ({ className, ...props }) => (
+  <th className={classNames('p-3', 'border', 'border-gray-300', 'w-[3em]', className)} {...props} />
 );
-const TD: React.FC<React.ComponentPropsWithoutRef<'td'>> = (props) => (
-  <td className="text-left p-3 border border-gray-300" {...props} />
+const TD: React.FC<React.ComponentPropsWithoutRef<'td'>> = ({ className, ...props }) => (
+  <td className={`p-3 border border-gray-300 ${className}`} {...props} />
 );
 
 const Head: React.FC<{
@@ -47,7 +61,9 @@ const Head: React.FC<{
         </tr>
         <tr>
           {row2.map((heading, i) => (
-            <TH key={i}>{heading}</TH>
+            <TH key={i} className="text-right">
+              {heading}
+            </TH>
           ))}
         </tr>
       </THead>
@@ -98,7 +114,7 @@ const Body: React.FC<{
   const rows = data.split(rowDelimiter).map((row) => row.split(columnDelimiter).slice(1, -1));
 
   return (
-    <tbody>
+    <tbody className="bg-white">
       {rows.map((row, i) => (
         <tr key={i}>
           {row.map((column, j) => (
