@@ -15,11 +15,11 @@ const BOX_TYPES = {
     icon: <DocumentTextIcon className="size-6 -mt-1 text-purple-400" />
   },
   warning: {
-    containerClass: 'bg-orange-50',
+    containerClass: 'bg-rose-50',
     icon: <ExclamationTriangleIcon className="size-6 -mt-2 text-orange-400" />
   },
   focus: {
-    containerClass: 'bg-slate-50',
+    containerClass: 'bg-orange-50',
     icon: null
   }
 };
