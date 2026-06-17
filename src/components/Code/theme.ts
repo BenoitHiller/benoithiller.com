@@ -4,23 +4,23 @@ type ThemeColors = NonNullable<ThemeRegistration['tokenColors']>;
 
 // I've copied in the full palette from my vim theme, but some colors aren't
 // used here yet.
-const Black = '#252525';
-const DarkRed = '#C73205';
-const DarkGreen = '#58AD06';
-const DarkYellow = '#C0751E';
-const DarkBlue = '#5FD7FF';
-const DarkMagenta = '#7C5283';
-const DarkCyan = '#238789';
+const Black = 'var(--color-ansi-black)';
+const DarkRed = 'var(--color-ansi-dark-red)';
+const DarkGreen = 'var(--color-ansi-dark-green)';
+const DarkYellow = 'var(--color-ansi-dark-yellow)';
+const DarkBlue = 'var(--color-ansi-dark-blue)';
+const DarkMagenta = 'var(--color-ansi-dark-magenta)';
+const DarkCyan = 'var(--color-ansi-dark-cyan)';
 
-const Gray = '#B6BEB1';
-const DarkGray = '#8C8C8C';
-const Red = '#EF5858';
-const Green = '#A6E964';
-const Yellow = '#F0D25E';
-const Blue = '#95B3D4';
-const Magenta = '#CC98C6';
-const Cyan = '#79D6C5';
-const White = '#E2E2DB';
+const Gray = 'var(--color-ansi-gray)';
+const DarkGray = 'var(--color-ansi-dark-gray)';
+const Red = 'var(--color-ansi-red)';
+const Green = 'var(--color-ansi-green)';
+const Yellow = 'var(--color-ansi-yellow)';
+const Blue = 'var(--color-ansi-blue)';
+const Magenta = 'var(--color-ansi-magenta)';
+const Cyan = 'var(--color-ansi-cyan)';
+const White = 'var(--color-ansi-white)';
 
 const Normal = White;
 const CommentColor = DarkGray;

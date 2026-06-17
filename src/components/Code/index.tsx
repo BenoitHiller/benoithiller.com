@@ -1,23 +1,27 @@
 import React from 'react';
 import * as R from 'ramda';
 import DotGraph from '@/components/DotGraph';
-import codeTheme from '@/components/codeTheme';
+import classNames from 'classnames';
 import type { ShikiTransformer } from 'shiki';
 import type { JSX } from 'react';
 import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import { Fragment } from 'react';
 import { jsx, jsxs } from 'react/jsx-runtime';
+import codeTheme from './theme';
 import { codeToHast } from './highlighter';
 
 const DEFAULT_STYLE = `color:${codeTheme.colors!['editor.foreground']}`;
-const codeOverrides: { [key: string]: React.FC<{ children: string }> } = {
+const codeOverrides: { [key: string]: React.FC<{ children: string; meta: CodeMeta }> } = {
   dot: DotGraph
 };
+
+interface CodeMeta {
+  title?: string;
+}
 
 interface ParsedCode {
   code: string;
   lang: string;
-  title?: string;
 }
 
 function isCodeElement(
@@ -101,29 +105,55 @@ const Code: React.FC<{ code: string; lang: string }> = async ({ code, lang }) =>
           return <span {...props} />;
         }
       },
-      pre: (props) => (
-        <pre
-          {...props}
-          tabIndex={undefined}
-          className="expand-to-edge max-md:py-6 md:py-8 overflow-x-auto pr-8 prose-spacing collapse-before"
-        />
-      ),
+      pre: (props) => <pre {...props} tabIndex={undefined} />,
       code: (props) => <code {...props} className="block w-min" />
     }
   }) as JSX.Element;
 };
 
-const CodeWrapper: React.FC<{ children: React.ReactNode }> = (props) => {
-  const { children } = props;
+const CodeBox: React.FC<{ children: React.ReactNode; meta: CodeMeta }> = ({
+  children,
+  meta: { title }
+}) => {
+  return (
+    <figure
+      className={classNames(
+        'expand-to-edge',
+        {
+          'max-md:pt-6': !title,
+          'md:pt-8': !title
+        },
+        'max-md:pb-6',
+        'md:pb-8',
+        'overflow-x-auto',
+        'pr-8',
+        'prose-spacing',
+        'collapse-before',
+        'bg-ansi-black',
+        'font-mono'
+      )}
+    >
+      {title && <figcaption className="text-center text-ansi-gray pt-3">{title}</figcaption>}
+      {children}
+    </figure>
+  );
+};
+
+const CodeWrapper: React.FC<{ children: React.ReactNode } & CodeMeta> = (props) => {
+  const { children, ...rest } = props;
   const parsed = parseChildren(children);
 
   const { lang, code } = parsed;
 
   if (lang in codeOverrides) {
     const Component = codeOverrides[lang];
-    return <Component>{code}</Component>;
+    return <Component meta={rest}>{code}</Component>;
   } else {
-    return <Code lang={lang} code={code} />;
+    return (
+      <CodeBox meta={rest}>
+        <Code lang={lang} code={code} />
+      </CodeBox>
+    );
   }
 };
 

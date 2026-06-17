@@ -1,4 +1,4 @@
-import codeTheme from '@/components/codeTheme';
+import codeTheme from './theme';
 import { createHighlighter, bundledLanguages } from 'shiki';
 import type { Highlighter } from 'shiki';
 

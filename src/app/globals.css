@@ -8,6 +8,25 @@
   --color-body-text: var(--color-gray-700);
   --color-dark-text: var(--color-gray-800);
   --color-header-text: var(--color-gray-900);
+
+  --color-ansi-black: #252525;
+  --color-ansi-dark-red: #C73205;
+  --color-ansi-dark-green: #58AD06;
+  --color-ansi-dark-yellow: #C0751E;
+  --color-ansi-dark-blue: #5FD7FF;
+  --color-ansi-dark-magenta: #7C5283;
+  --color-ansi-dark-cyan: #238789;
+
+  --color-ansi-gray: #B6BEB1;
+  --color-ansi-dark-gray: #8C8C8C;
+  --color-ansi-red: #EF5858;
+  --color-ansi-green: #A6E964;
+  --color-ansi-yellow: #F0D25E;
+  --color-ansi-blue: #95B3D4;
+  --color-ansi-magenta: #CC98C6;
+  --color-ansi-cyan: #79D6C5;
+  --color-ansi-white: #E2E2DB;
+
   --value-dvh: 100dvh;
 }
 
