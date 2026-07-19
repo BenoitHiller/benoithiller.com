@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@source "../blog/drafts";
 
 @theme inline {
   --font-sans: var(--font-mplus), sans serif;
