@@ -2,13 +2,19 @@
 
 import type { Toc, TocEntry } from '@stefanprobst/rehype-extract-toc';
 import type React from 'react';
-import { useEffect, useState, useContext, createContext } from 'react';
+import { useEffect, useState, useContext, createContext, useMemo } from 'react';
 import Link from 'next/link';
 import * as R from 'ramda';
 import classNames from 'classnames';
 import debounce from 'lodash.debounce';
 
 const CurrentIdContext = createContext<string | null>(null);
+
+const citationsEntry: TocEntry = {
+  value: 'References',
+  depth: 1,
+  id: 'citations'
+};
 
 const Entry: React.FC<{ entry: TocEntry }> = ({ entry }) => {
   const { id, value, children } = entry;
@@ -42,11 +48,16 @@ const Section: React.FC<{ entries?: Toc }> = ({ entries }) => {
   );
 };
 
-const TableOfContents: React.FC<{ className?: string; entries: Toc }> = ({
+const TableOfContents: React.FC<{ className?: string; entries: Toc; addReferences?: boolean }> = ({
   className,
-  entries
+  entries,
+  addReferences
 }) => {
   const [currentId, setCurrentId] = useState<string | null>(null);
+  const fullEntries = useMemo(
+    () => (addReferences ? [...entries, citationsEntry] : entries),
+    [entries, addReferences]
+  );
 
   // I'm using a scroll and resize handler her in place of an
   // IntersectionObserver because sadly that would require me to transform the
@@ -97,13 +108,13 @@ const TableOfContents: React.FC<{ className?: string; entries: Toc }> = ({
       window.removeEventListener('resize', debouncedUpdate);
       debouncedUpdate.cancel();
     };
-  }, [entries]);
+  }, [fullEntries]);
 
   return (
     <div className={classNames('flex flex-col gap-2 w-[inherit]', className)}>
       <h3>Contents</h3>
       <CurrentIdContext value={currentId}>
-        <Section entries={entries} />
+        <Section entries={fullEntries} />
       </CurrentIdContext>
     </div>
   );

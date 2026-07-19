@@ -6,6 +6,7 @@ import type { Toc } from '@stefanprobst/rehype-extract-toc';
 import git from 'isomorphic-git';
 import * as R from 'ramda';
 import * as RA from 'ramda-adjunct';
+import type { Citation } from '@/components/Citation';
 
 /**
  * Metadata object exported inside the post pages.
@@ -17,11 +18,13 @@ interface Metadata {
   title?: string;
   description?: string;
   publishedAt?: Date;
+  references?: Citation[];
 }
 
 interface BlogPost {
   slug: string;
   title?: string;
+  references?: Citation[];
   description?: string;
   Component: React.FC;
   tableOfContents: Toc;
@@ -67,13 +70,14 @@ const get: (slug: string[] | string) => Promise<BlogPost> = cache(async (slug) =
   const slugPath = typeof slug === 'string' ? slug : slug.join('/');
   const { default: Component, metadata, tableOfContents } = await importPost(slugPath);
 
-  const { title, description, publishedAt } = metadata ?? {};
+  const { title, references, description, publishedAt } = metadata ?? {};
 
   // For drafts skip looking them up in git.
   if (slugPath.startsWith('drafts/')) {
     return {
       slug: slugPath,
       title,
+      references,
       description,
       Component,
       tableOfContents
@@ -106,6 +110,7 @@ const get: (slug: string[] | string) => Promise<BlogPost> = cache(async (slug) =
   return {
     slug: slugPath,
     title,
+    references,
     description,
     Component,
     tableOfContents,
@@ -132,5 +137,5 @@ const list: () => Promise<BlogPost[]> = cache(async () => {
   );
 });
 
-export type { BlogPost };
+export type { BlogPost, Metadata };
 export { get, list, listFiles };

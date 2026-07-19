@@ -1,4 +1,6 @@
 import React from 'react';
+import type { CitationProps, Citation } from '.';
+
 /**
  * @module components/Citation
  *
@@ -21,11 +23,11 @@ const FORMAT_REGEX = /%(?<key>\w+);?|[^%]+|%%/g;
  * Outputs formatted React using a printf style format definition to append values based on the data
  * object the writer is initialized with.
  */
-class CitationWriter<T extends { [K in keyof T]: React.ReactNode }> {
-  private data: T;
+class CitationWriter<T extends string> {
+  private data: CitationProps<T>;
   private nodes: React.ReactNode[];
 
-  constructor(data: T) {
+  constructor(data: CitationProps<T>) {
     this.data = data;
     this.nodes = [];
   }
@@ -50,8 +52,8 @@ class CitationWriter<T extends { [K in keyof T]: React.ReactNode }> {
    *
    * Some styling is applied to the %url components specifically for use in citations.
    */
-  format(key: keyof T, template: string) {
-    const value = this.data[key];
+  format(key: keyof CitationProps<T>, template: string) {
+    const value = this.data[key] as React.ReactNode;
     if (value) {
       // For now it is safe to put spaces between the individual elements and allow whitespace
       // collapsing to remove the initial one. There may eventually be cases where we need to be
@@ -59,19 +61,19 @@ class CitationWriter<T extends { [K in keyof T]: React.ReactNode }> {
       this.write(' ');
       const matches = template.matchAll(FORMAT_REGEX);
       for (const match of matches) {
-        const key = match.groups?.['key'];
-        if (key) {
-          switch (key) {
+        const formatter = match.groups?.['key'];
+        if (formatter) {
+          switch (formatter) {
             case 's':
               this.write(value);
               break;
             case 'italic':
-              this.write(<i key={`${key} ${match}`}>{value}</i>);
+              this.write(<i key={`${String(key)} ${match}`}>{value}</i>);
               break;
             case 'url':
               this.write(
                 <a
-                  key={`${key} ${match}`}
+                  key={`${String(key)} ${match}`}
                   href={`${value}`}
                   target="_blank"
                   className="invisible-link"
@@ -106,19 +108,7 @@ class CitationWriter<T extends { [K in keyof T]: React.ReactNode }> {
   }
 }
 
-interface ArticleProps {
-  author?: string;
-  title: string;
-  journal: string;
-  month: string;
-  year: string;
-  volume: number;
-  number: number;
-  doi?: string;
-  pages: string;
-}
-
-const Article: React.FC<ArticleProps> = (props) => {
+const Article: React.FC<CitationProps<'article'>> = (props) => {
   const writer = new CitationWriter(props);
   writer.format('author', '%s,');
   writer.format('title', '"%s,"');
@@ -134,17 +124,7 @@ const Article: React.FC<ArticleProps> = (props) => {
   return writer.render();
 };
 
-interface BlogProps {
-  author?: string;
-  title: string;
-  journal?: string;
-  month: string;
-  day: string;
-  year: string;
-  url: string;
-}
-
-const Blog: React.FC<BlogProps> = (props) => {
+const Blog: React.FC<CitationProps<'blog'>> = (props) => {
   const writer = new CitationWriter(props);
 
   writer.format('author', '%s,');
@@ -159,38 +139,7 @@ const Blog: React.FC<BlogProps> = (props) => {
   return writer.render();
 };
 
-interface LectureNotesProps {
-  author?: string;
-  title: string;
-  year: string;
-  howpublished: string;
-  url: string;
-}
-
-const LectureNotes: React.FC<LectureNotesProps> = (props) => {
-  const writer = new CitationWriter(props);
-
-  writer.format('author', '%s.');
-  writer.format('year', '(%s).');
-  writer.format('title', '%s');
-  writer.format('howpublished', '[%s].');
-  writer.format('url', 'Available: %url');
-
-  return writer.render();
-};
-
-interface BookProps {
-  author: string;
-  title: string;
-  year: string;
-  country?: string;
-  state?: string;
-  city?: string;
-  publisher: string;
-  edition?: string;
-}
-
-const Book: React.FC<BookProps> = (props) => {
+const Book: React.FC<CitationProps<'book'>> = (props) => {
   const writer = new CitationWriter(props);
 
   writer.format('author', '%s,');
@@ -206,20 +155,64 @@ const Book: React.FC<BookProps> = (props) => {
   return writer.render();
 };
 
-interface MastersThesisProps {
-  author: string;
-  title: string;
-  year: string;
-  school: string;
-  country?: string;
-  state?: string;
-  city?: string;
-  month?: string;
-  day?: string;
-  url?: string;
-}
+const ConferenceProceedings: React.FC<CitationProps<'conference-proceedings'>> = (props) => {
+  const writer = new CitationWriter(props);
 
-const MastersThesis: React.FC<MastersThesisProps> = (props) => {
+  writer.format('author', '%s,');
+  writer.format('title', '"%s,"');
+  writer.format('conference', 'in %italic,');
+  writer.format('year', '%s,');
+  writer.format('pages', 'pp. %s,');
+  writer.format('doi', 'doi: %url');
+  writer.write('.');
+
+  return writer.render();
+};
+
+const GovernmentProceeding: React.FC<CitationProps<'government-proceeding'>> = (props) => {
+  const writer = new CitationWriter(props);
+
+  writer.format('country', '%s,');
+  writer.format('legislativeBody', '%s,');
+  writer.format('parliament', '%s,');
+  writer.format('session', '%s.');
+  writer.format('year', '(%s,');
+  writer.format('month', '%s.');
+  writer.format('day', '%s).');
+  writer.format('number', '%italic,');
+  writer.format('title', '%italic.');
+  writer.format('url', '[Online]. Available: %url');
+
+  return writer.render();
+};
+
+const GovernmentAct: React.FC<CitationProps<'government-act'>> = (props) => {
+  const writer = new CitationWriter(props);
+
+  writer.format('country', '%s');
+  writer.format('title', '%italic.');
+  writer.format('number', '%italic,');
+  writer.format('year', '(%s,');
+  writer.format('month', '%s.');
+  writer.format('day', '%s).');
+  writer.format('url', '[Online]. Available: %url');
+
+  return writer.render();
+};
+
+const LectureNotes: React.FC<CitationProps<'lecture-notes'>> = (props) => {
+  const writer = new CitationWriter(props);
+
+  writer.format('author', '%s.');
+  writer.format('year', '(%s).');
+  writer.format('title', '%s');
+  writer.format('howpublished', '[%s].');
+  writer.format('url', 'Available: %url');
+
+  return writer.render();
+};
+
+const MastersThesis: React.FC<CitationProps<'masters-thesis'>> = (props) => {
   const writer = new CitationWriter(props);
 
   writer.format('author', '%s,');
@@ -238,4 +231,25 @@ const MastersThesis: React.FC<MastersThesisProps> = (props) => {
   return writer.render();
 };
 
-export { Article, Blog, Book, LectureNotes, MastersThesis };
+const Writer: React.FC<{ citation: Citation }> = ({ citation }) => {
+  switch (citation.type) {
+    case 'article':
+      return <Article {...citation} />;
+    case 'blog':
+      return <Blog {...citation} />;
+    case 'book':
+      return <Book {...citation} />;
+    case 'conference-proceedings':
+      return <ConferenceProceedings {...citation} />;
+    case 'government-act':
+      return <GovernmentAct {...citation} />;
+    case 'government-proceeding':
+      return <GovernmentProceeding {...citation} />;
+    case 'lecture-notes':
+      return <LectureNotes {...citation} />;
+    case 'masters-thesis':
+      return <MastersThesis {...citation} />;
+  }
+};
+
+export default Writer;

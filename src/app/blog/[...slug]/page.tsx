@@ -4,6 +4,7 @@ import 'katex/dist/katex.min.css';
 import TableOfContents from './TableOfContents';
 import Footer from './Footer';
 import * as TwoColumns from '@/components/TwoColumns';
+import { Bibliography, CitationProvider } from '@/components/Citation';
 
 import * as blogDb from '@/data/blog';
 
@@ -28,24 +29,28 @@ async function generateMetadata({ params }: PageProps<'/blog/[...slug]'>): Promi
 async function Page({ params }: PageProps<'/blog/[...slug]'>) {
   const { slug } = await params;
   const post = await blogDb.get(slug);
-  const { Component, title, tableOfContents } = post;
+  const { Component, title, tableOfContents, references } = post;
 
   return (
-    <TwoColumns.Layout>
-      <TwoColumns.Left className="w-64 max-h2-dvh/14" padding={false} hideable>
-        <TableOfContents
-          className="py-6 max-h2-100%/14 fixed scrollbar-thin overflow-y-auto"
-          entries={tableOfContents}
-        />
-      </TwoColumns.Left>
-      <TwoColumns.Right Element="article">
-        <div className="prose max-md:w-full">
-          <h1>{title ?? slug.join('/')}</h1>
-          <Component />
-        </div>
-        <Footer post={post} />
-      </TwoColumns.Right>
-    </TwoColumns.Layout>
+    <CitationProvider value={references ?? []}>
+      <TwoColumns.Layout>
+        <TwoColumns.Left className="w-64 max-h2-dvh/14" padding={false} hideable>
+          <TableOfContents
+            className="py-6 max-h2-100%/14 fixed scrollbar-thin overflow-y-auto"
+            entries={tableOfContents}
+            addReferences={!!references}
+          />
+        </TwoColumns.Left>
+        <TwoColumns.Right Element="article">
+          <div className="prose max-md:w-full">
+            <h1>{title ?? slug.join('/')}</h1>
+            <Component />
+            {references && <Bibliography />}
+          </div>
+          <Footer post={post} />
+        </TwoColumns.Right>
+      </TwoColumns.Layout>
+    </CitationProvider>
   );
 }
 
