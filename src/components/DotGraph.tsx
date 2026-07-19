@@ -30,7 +30,10 @@ const DotGraph: React.FC<{ children: string; meta: { title?: string } }> = ({
   } else {
     return (
       <figure className={`prose-spacing ${styles.graph}`}>
-        <div className="w-full *:w-full" dangerouslySetInnerHTML={{ __html: svg.output }} />
+        <div
+          className="w-full *:w-full font-mono font-semibold text-[12px]"
+          dangerouslySetInnerHTML={{ __html: svg.output }}
+        />
         {title && <figcaption className="mt-3 text-center">{title}</figcaption>}
       </figure>
     );

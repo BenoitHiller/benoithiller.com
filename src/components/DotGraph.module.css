@@ -16,8 +16,9 @@
   }
 
   & text {
-    font-weight: var(--font-weight-semibold);
-    font-family: var(--font-mono);
+    font-weight: inherit;
+    font-family: inherit;
+    font-size: inherit;
     /* In a svg the css color prop is only applied to text if the following is set. */
     fill: currentColor;
   }

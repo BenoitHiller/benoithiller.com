@@ -158,8 +158,27 @@
 }
 
 @utility svg-stroke-* {
-  polygon {
-    stroke: --value(--color-*);
+  polygon, path, ellipse {
+    stroke: --value(--color-*) !important;
+  }
+}
+
+@utility svg-fill-* {
+  polygon, path, ellipse {
+    fill: --value(--color-*) !important;
+  }
+}
+
+@utility svg-color-* {
+  polygon, path, ellipse {
+    fill: --value(--color-*) !important;
+    stroke: --value(--color-*) !important;
+  }
+}
+
+@utility svg-text-* {
+  text {
+    fill: --value(--color-*) !important;
   }
 }
 
