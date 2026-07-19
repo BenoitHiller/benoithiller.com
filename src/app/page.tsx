@@ -8,7 +8,7 @@ async function Page() {
     <TwoColumns.Layout>
       <TwoColumns.Left className="prose pr-6 lg:w-lg">
         <H2>About</H2>
-        <p>This is Benoit Hiller's personal portfolio website and and blog.</p>
+        <p>This is Benoit Hiller's personal portfolio website and blog.</p>
         <p>
           I've selected a few samples of my recent work available on GitHub in the Portfolio
           section. You can find a link to my full profile below.
