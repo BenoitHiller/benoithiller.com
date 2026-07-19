@@ -68,6 +68,10 @@
   ol {
     list-style: decimal;
     --marker-color: var(--color-dark-text);
+
+    ol {
+      list-style: lower-alpha;
+    }
   }
 
   ul {
