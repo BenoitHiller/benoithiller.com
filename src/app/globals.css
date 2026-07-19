@@ -3,6 +3,7 @@
 @theme inline {
   --font-sans: var(--font-mplus), sans serif;
   --font-mono: var(--font-cascadia), monospace;
+  --font-math: KaTeX_Main, Times New Roman, serif;
 
   --color-body-background: hsl(210, 40%, 99%);;
   --color-body-text: var(--color-gray-700);

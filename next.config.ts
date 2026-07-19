@@ -1,6 +1,7 @@
 import path from 'path';
 import type { NextConfig } from 'next';
 import createMDX from '@next/mdx';
+import type { KatexOptions } from 'katex';
 
 const rootPath = path.resolve(__dirname);
 const development = process.env.NODE_ENV === 'development';
@@ -28,9 +29,16 @@ const nextConfig: NextConfig = {
   }
 };
 
+const katexOptions: KatexOptions = {
+  strict: false,
+  macros: {
+    '\\|': '\\,|\\,'
+  }
+};
+
 const rehypePlugins = [
   ['rehype-slug'],
-  ['rehype-katex'],
+  ['rehype-katex', katexOptions],
   ['@stefanprobst/rehype-extract-toc'],
   ['@stefanprobst/rehype-extract-toc/mdx'],
   ['rehype-mdx-code-props']
