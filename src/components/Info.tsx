@@ -4,6 +4,7 @@ import {
   ExclamationTriangleIcon,
   DocumentTextIcon
 } from '@heroicons/react/20/solid';
+import classNames from 'classnames';
 
 const BOX_TYPES = {
   info: {
@@ -25,6 +26,7 @@ const BOX_TYPES = {
 };
 
 type BoxKind = keyof typeof BOX_TYPES;
+type BoxComponent = React.FC<{ children: React.ReactNode; className?: string }>;
 
 const InfoBoxIcon: React.FC<{ type: BoxKind }> = ({ type }) => {
   const { icon } = BOX_TYPES[type];
@@ -42,14 +44,26 @@ const InfoBoxIcon: React.FC<{ type: BoxKind }> = ({ type }) => {
   }
 };
 
-const Info: React.FC<{ children: React.ReactNode; type?: BoxKind }> = ({
+const Info: React.FC<{ children: React.ReactNode; className?: string; type?: BoxKind }> = ({
   children,
+  className,
   type = 'info'
 }) => {
   const { containerClass } = BOX_TYPES[type];
   return (
     <div
-      className={`info-box expand-to-edge py-6 prose-spacing collapse-before collapse-after ${containerClass}`}
+      className={classNames(
+        'info-box',
+        'break-inside-avoid',
+        'expand-to-edge',
+        'py-6',
+        'prose-spacing',
+        'collapse-before',
+        'collapse-after',
+        'collapse-inside',
+        containerClass,
+        className
+      )}
     >
       <div className="group info-box-content">
         <InfoBoxIcon type={type} />
@@ -59,10 +73,8 @@ const Info: React.FC<{ children: React.ReactNode; type?: BoxKind }> = ({
   );
 };
 
-const Note: React.FC<{ children: React.ReactNode }> = (props) => <Info type="note" {...props} />;
-const Warning: React.FC<{ children: React.ReactNode }> = (props) => (
-  <Info type="warning" {...props} />
-);
-const Focus: React.FC<{ children: React.ReactNode }> = (props) => <Info type="focus" {...props} />;
+const Note: BoxComponent = (props) => <Info type="note" {...props} />;
+const Warning: BoxComponent = (props) => <Info type="warning" {...props} />;
+const Focus: BoxComponent = (props) => <Info type="focus" {...props} />;
 
 export { Info, Note, Warning, Focus };

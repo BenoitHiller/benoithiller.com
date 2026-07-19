@@ -116,7 +116,7 @@ const Body: React.FC<{
   return (
     <tbody className="bg-white">
       {rows.map((row, i) => (
-        <tr key={i}>
+        <tr className="break-inside-avoid" key={i}>
           {row.map((column, j) => (
             <TD key={`${i},${j}`}>{column}</TD>
           ))}

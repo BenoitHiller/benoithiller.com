@@ -45,9 +45,9 @@ export default function Layout({
   return (
     <ClientContext>
       <html lang="en" className={`scroll-pt-18 ${mPlus.variable} ${cascadia.variable}`}>
-        <body className="bg-body-background">
+        <body className="bg-body-background print:bg-transparent">
           {print}
-          <header className="non-printable fixed inset-x-0 z-10 bg-white border-b border-gray-950/5">
+          <header className="non-printable print:hidden fixed inset-x-0 z-10 bg-white border-b border-gray-950/5">
             <div className="container mx-auto">
               <nav className="mx-6 flex h-14 gap-4 items-center">
                 <HeaderNavLink href="/">Home</HeaderNavLink>
@@ -55,7 +55,7 @@ export default function Layout({
               </nav>
             </div>
           </header>
-          <section className="non-printable pt-14 min-h-dvh container mx-auto max-lg:w-min">
+          <section className="non-printable pt-14 print:pt-0 min-h-dvh container mx-auto max-lg:w-min">
             <div className="max-xl:max-w-dvw">{children}</div>
           </section>
         </body>

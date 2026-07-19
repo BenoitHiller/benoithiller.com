@@ -49,6 +49,7 @@
   }
 
   pre code {
+    break-inside: avoid;
     line-height: 19px;
     color: inherit;
   }
@@ -77,6 +78,7 @@
     padding-inline-start: --spacing(6);
 
     > li {
+      break-before: avoid;
       padding-inline-start: --spacing(1);
 
       &::marker {
@@ -146,9 +148,24 @@
 }
 
 .collapse-after + .collapse-before,
-.collapse-before:first-child {
+.collapse-inside > .collapse-before:first-child {
   border-top: unset;
   margin-top: --spacing(-5);
+}
+
+@media print {
+  .no-break > .collapse-before:first-child {
+    border-top: unset;
+    margin-top: --spacing(-5);
+  }
+}
+
+.break-after-page + .collapse-before {
+  border-top: unset;
+
+  @media not print {
+    margin-top: --spacing(-5);
+  }
 }
 
 .invisible-link {
