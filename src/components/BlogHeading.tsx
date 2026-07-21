@@ -23,7 +23,7 @@ const BlogHeading: React.FC<{
 
   return (
     <div
-      className={`heading heading-${Component} collapse-before expand-to-edge max-lg:wplus-12 lg:wplus-18 ${className} ${border ? 'border-t-1 border-t-gray-950/5' : ''}`}
+      className={`heading heading-${Component} collapse-before expand-to-edge max-md:wplus-12 md:wplus-14 ${className} ${border ? 'border-t-1 border-t-gray-950/5' : ''}`}
     >
       {content}
     </div>

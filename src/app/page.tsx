@@ -6,7 +6,7 @@ import { H2 } from '@/components/BlogHeading';
 async function Page() {
   return (
     <TwoColumns.Layout>
-      <TwoColumns.Left className="prose pr-6 lg:w-lg">
+      <TwoColumns.Left className="prose pr-6 xl:w-lg collapse-inside">
         <H2>About</H2>
         <p>This is Benoit Hiller's personal portfolio website and blog.</p>
         <p>
@@ -20,7 +20,7 @@ async function Page() {
           </dd>
         </dl>
       </TwoColumns.Left>
-      <TwoColumns.Right className="prose">
+      <TwoColumns.Right className="prose collapse-inside">
         <H2>Portfolio</H2>
         <Card
           title="benoithiller.com"

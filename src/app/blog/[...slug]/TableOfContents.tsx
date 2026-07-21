@@ -20,7 +20,7 @@ const Entry: React.FC<{ entry: TocEntry }> = ({ entry }) => {
   const { id, value, children } = entry;
   const currentId = useContext(CurrentIdContext);
 
-  const className = classNames('inline-block text-sm/8 text-gray-600 hover:text-gray-950', {
+  const className = classNames('inline-block text-base/8 text-gray-600 hover:text-gray-950', {
     'font-semibold': currentId == id
   });
 
@@ -111,7 +111,7 @@ const TableOfContents: React.FC<{ className?: string; entries: Toc; addReference
   }, [fullEntries]);
 
   return (
-    <div className={classNames('flex flex-col gap-2 w-[inherit]', className)}>
+    <div className={classNames('flex md:border-r border-gray-950/5 flex-col gap-2 w-[inherit]', className)}>
       <h3>Contents</h3>
       <CurrentIdContext value={currentId}>
         <Section entries={fullEntries} />

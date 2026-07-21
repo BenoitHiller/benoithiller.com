@@ -34,7 +34,7 @@ const InfoBoxIcon: React.FC<{ type: BoxKind }> = ({ type }) => {
     return (
       <div
         role="img"
-        className="inline-block not-prose float-right pl-2 max-md:-mr-3 md:-mr-6"
+        className="inline-block not-prose float-right pl-2 -mr-3"
         aria-label={type}
         title={type}
       >

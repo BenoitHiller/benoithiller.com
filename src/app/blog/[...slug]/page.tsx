@@ -34,15 +34,15 @@ async function Page({ params }: PageProps<'/blog/[...slug]'>) {
   return (
     <CitationProvider value={references ?? []}>
       <TwoColumns.Layout>
-        <TwoColumns.Left className="w-64 max-h2-dvh/14" padding={false} hideable>
+        <TwoColumns.Left className="w-68 max-h2-dvh/14 shrink-0" padding={false} hideable>
           <TableOfContents
-            className="py-6 max-h2-100%/14 fixed scrollbar-thin overflow-y-auto"
+            className="py-6 pr-2 h2-100%/14 fixed scrollbar-thin overflow-y-auto"
             entries={tableOfContents}
             addReferences={!!references}
           />
         </TwoColumns.Left>
-        <TwoColumns.Right Element="article">
-          <div className="prose max-md:w-full">
+        <TwoColumns.Right Element="article" className="md:max-w2-100%/80">
+          <div className="prose max-sm:w-full">
             <h1>{title ?? slug.join('/')}</h1>
             <Component />
             {references && <Bibliography />}

@@ -30,13 +30,25 @@
   --color-ansi-white: #E2E2DB;
 
   --value-dvh: 100dvh;
+  --value-dvw: 100dvw;
+
+  --breakpoint-sm: 48rem;
+  --breakpoint-md: 64rem;
+  --breakpoint-lg: 80rem;
+  --breakpoint-xl: 96rem;
+
+  --body-padding: --spacing(12);
+  --container-body-sm: calc(var(--breakpoint-sm) - var(--body-padding));
+  --container-body-md: calc(var(--breakpoint-md) - var(--body-padding));
+  --container-body-lg: calc(var(--breakpoint-lg) - var(--body-padding));
+  --container-body-xl: calc(var(--breakpoint-xl) - var(--body-padding));
 }
 
 .prose {
   max-width: 65ch;
 
   font-weight: 400;
-  font-size: 1rem;
+  font-size: 1.125rem;
   line-height: 1.5;
 
   color: var(--color-body-text);
@@ -50,13 +62,13 @@
   }
 
   pre code {
+    @apply max-lg:text-base lg:text-lg/6;
     break-inside: avoid;
-    line-height: 19px;
     color: inherit;
   }
 
   code {
-    font-size: 16px;
+    font-size: 1.125rem;
     font-weight: 400;
     color: var(--color-dark-text);
   }
@@ -179,6 +191,24 @@
   text-decoration: inherit;
 }
 
+.body-container {
+  width: calc(100% - var(--body-padding-sm));
+
+  @media (width >= 48rem) {
+    width: 100%;
+    max-width: var(--container-body-sm);
+  }
+  @media (width >= 64rem) {
+    max-width: var(--container-body-md);
+  }
+  @media (width >= 80rem) {
+    max-width: var(--container-body-lg);
+  }
+  @media (width >= 96rem) {
+    max-width: var(--container-body-xl);
+  }
+}
+
 @utility svg-stroke-* {
   polygon, path, ellipse {
     stroke: --value(--color-*) !important;
@@ -215,7 +245,7 @@
 }
 
 @utility expand-to-edge {
-  @apply max-lg:expand-l-6 max-lg:expand-r-6 lg:expand-l-8 lg:expand-r-10
+  @apply max-md:expand-l-6 max-md:expand-r-6 md:expand-l-8 md:expand-r-6
 }
 
 @utility -wplus-* {
@@ -229,6 +259,21 @@
 @utility max-h2-* {
   max-height: calc(--value(number, percentage) - --spacing(--modifier(integer)));
   max-height: calc(--value(--value) - --spacing(--modifier(integer)));
+}
+
+@utility max-w2-* {
+  max-width: calc(--value(number, percentage) - --spacing(--modifier(integer)));
+  max-width: calc(--value(--value) - --spacing(--modifier(integer)));
+}
+
+@utility w2-* {
+  width: calc(--value(number, percentage) - --spacing(--modifier(integer)));
+  width: calc(--value(--value) - --spacing(--modifier(integer)));
+}
+
+@utility h2-* {
+  height: calc(--value(number, percentage) - --spacing(--modifier(integer)));
+  height: calc(--value(--value) - --spacing(--modifier(integer)));
 }
 
 @utility prose-spacing {

@@ -48,15 +48,15 @@ export default function Layout({
         <body className="bg-body-background print:bg-transparent">
           {print}
           <header className="non-printable print:hidden fixed inset-x-0 z-10 bg-white border-b border-gray-950/5">
-            <div className="container mx-auto">
-              <nav className="mx-6 flex h-14 gap-4 items-center">
+            <div className="body-container mx-auto">
+              <nav className="flex h-14 gap-4 items-center">
                 <HeaderNavLink href="/">Home</HeaderNavLink>
                 <HeaderNavLink href="/blog">Blog</HeaderNavLink>
               </nav>
             </div>
           </header>
-          <section className="non-printable pt-14 print:pt-0 min-h-dvh container mx-auto max-lg:w-min">
-            <div className="max-xl:max-w-dvw">{children}</div>
+          <section className="non-printable pt-14 print:pt-0 min-h-dvh">
+            <div className="body-container mx-auto">{children}</div>
           </section>
         </body>
       </html>
