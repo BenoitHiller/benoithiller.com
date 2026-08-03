@@ -37,6 +37,7 @@
   --breakpoint-lg: 80rem;
   --breakpoint-xl: 96rem;
 
+  --prose-spacing: --spacing(5);
   --body-padding: --spacing(12);
   --container-body-sm: calc(var(--breakpoint-sm) - var(--body-padding));
   --container-body-md: calc(var(--breakpoint-md) - var(--body-padding));
@@ -105,9 +106,10 @@
     }
   }
 
-  p, ol, ul, table, blockquote {
-    @apply prose-spacing
+  p, ol, ul, table, blockquote, dd {
+    @apply not-last-child:mb-(--prose-spacing)
   }
+
 
   blockquote {
     font-style: italic;
@@ -162,7 +164,7 @@
   }
 
   dd {
-    @apply vertical-margin-between-3;
+    --prose-spacing: --spacing(3);
 
     margin-top: --spacing(2);
     padding-inline-start: --spacing(5);
@@ -285,12 +287,8 @@ pre > code.language-ansi {
   height: calc(--value(--value) - --spacing(--modifier(integer)));
 }
 
-@utility prose-spacing {
-  @apply vertical-margin-between-5;
+@utility prose-spacing-* {
+  --prose-spacing: --spacing(--value(integer));
 }
 
-@utility vertical-margin-between-* {
-  &:not(:last-child) {
-    margin-bottom: --spacing(--value(integer));
-  }
-}
+@custom-variant not-last-child (&:not(:last-child));

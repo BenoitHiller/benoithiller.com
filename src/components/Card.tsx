@@ -1,7 +1,9 @@
 import Link from 'next/link';
 
 const Tag: React.FC<{ tag: string }> = ({ tag }) => (
-  <li className="inline px-2 rounded-sm bg-blue-50 text-gray-600 font-light">{tag}</li>
+  <li className="inline px-2 pb-1 rounded-sm bg-blue-50 text-gray-600 font-light leading-8">
+    {tag}
+  </li>
 );
 
 const Card: React.FC<{
@@ -15,10 +17,10 @@ const Card: React.FC<{
     <div className="px-4 py-6 mb-6 bg-white rounded-md border border-gray-300">
       <Link href={href}>{title}</Link>
       {subTitle && <div className="text-gray-500 text-xs font-light">{subTitle}</div>}
-      <p className="mt-3">{children}</p>
+      <div className="mt-3 prose-spacing-3">{children}</div>
 
       {tags && (
-        <ul className="not-prose inline-flex gap-2">
+        <ul className="not-prose inline-flex gap-2 mt-5">
           {tags.split(' ').map((tag) => (
             <Tag key={tag} tag={tag} />
           ))}
