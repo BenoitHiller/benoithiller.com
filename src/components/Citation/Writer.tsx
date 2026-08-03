@@ -231,6 +231,34 @@ const MastersThesis: React.FC<CitationProps<'masters-thesis'>> = (props) => {
   return writer.render();
 };
 
+const PrintManual: React.FC<CitationProps<'print-manual'>> = (props) => {
+  const writer = new CitationWriter(props);
+
+  writer.format('title', '%italic,');
+  writer.format('edition', '%s,');
+  writer.format('company', '%s,');
+  writer.format('city', '%s,');
+  writer.format('state', '%s,');
+  writer.format('country', '%s,');
+  writer.format('year', '%s.');
+  writer.format('pages', 'pp. %s.');
+
+  return writer.render();
+};
+
+const DigitalManual: React.FC<CitationProps<'digital-manual'>> = (props) => {
+  const writer = new CitationWriter(props);
+
+  writer.format('author', '%s.');
+  writer.format('title', '%italic,');
+  writer.format('edition', '%s');
+  writer.format('year', '(%s).');
+  writer.format('accessed', 'Accessed: %s.');
+  writer.format('url', '[Online]. Available: %url.');
+
+  return writer.render();
+};
+
 const Writer: React.FC<{ citation: Citation }> = ({ citation }) => {
   switch (citation.type) {
     case 'article':
@@ -249,6 +277,10 @@ const Writer: React.FC<{ citation: Citation }> = ({ citation }) => {
       return <LectureNotes {...citation} />;
     case 'masters-thesis':
       return <MastersThesis {...citation} />;
+    case 'print-manual':
+      return <PrintManual {...citation} />;
+    case 'digital-manual':
+      return <DigitalManual {...citation} />;
   }
 };
 

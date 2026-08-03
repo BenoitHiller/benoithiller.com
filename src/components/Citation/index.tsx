@@ -14,6 +14,8 @@ type Citation = {
   | GovernmentProceedingProps
   | LectureNotesProps
   | MastersThesisProps
+  | PrintManualProps
+  | DigitalManualProps
 );
 
 type CitationProps<T extends string> = Citation & { type: T };
@@ -101,6 +103,24 @@ interface MastersThesisProps {
   month?: string;
   day?: string;
   url?: string;
+}
+
+interface PrintManualProps {
+  type: 'print-manual';
+  company: string;
+  edition?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  year: string;
+  pages?: string;
+}
+
+interface DigitalManualProps {
+  type: 'digital-manual';
+  edition?: string;
+  accessed?: string;
+  url: string;
 }
 
 export { Bibliography, Reference, CitationProvider };
