@@ -105,12 +105,17 @@
     }
   }
 
-  p, ol, ul, table {
+  p, ol, ul, table, blockquote {
     @apply prose-spacing
   }
 
   blockquote {
-    font-style: unset;
+    font-style: italic;
+    padding-top: --spacing(2);
+    padding-bottom: --spacing(3);
+    padding-inline-start: --spacing(5);
+    border-inline-start-width: 0.25rem;
+    border-inline-start-color: var(--color-stone-200);
   }
 
   h1, h2, h3, h4, h5, h6 {
