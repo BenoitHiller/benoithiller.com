@@ -88,6 +88,7 @@ const Code: React.FC<{ code: string; lang: string }> = async ({ code, lang }) =>
     lang,
     theme: 'hiller',
     mergeSameStyleTokens: true,
+    mergeWhitespaces: false,
     transformers: [removeRedundantSpans, removeEmptyLines]
   });
 
@@ -106,7 +107,7 @@ const Code: React.FC<{ code: string; lang: string }> = async ({ code, lang }) =>
         }
       },
       pre: (props) => <pre {...props} tabIndex={undefined} />,
-      code: (props) => <code {...props} className="block w-min" />
+      code: (props) => <code {...props} className={classNames('block w-min', `language-${lang}`)} />
     }
   }) as JSX.Element;
 };

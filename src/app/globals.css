@@ -214,6 +214,10 @@
   }
 }
 
+pre > code.language-ansi {
+  tab-size: 8;
+}
+
 @utility svg-stroke-* {
   polygon, path, ellipse {
     stroke: --value(--color-*) !important;
