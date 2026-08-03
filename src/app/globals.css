@@ -107,9 +107,8 @@
   }
 
   p, ol, ul, table, blockquote, dd {
-    @apply not-last-child:mb-(--prose-spacing)
+    @apply prose-spacing;
   }
-
 
   blockquote {
     font-style: italic;
@@ -285,6 +284,10 @@ pre > code.language-ansi {
 @utility h2-* {
   height: calc(--value(number, percentage) - --spacing(--modifier(integer)));
   height: calc(--value(--value) - --spacing(--modifier(integer)));
+}
+
+@utility prose-spacing {
+  @apply not-last-child:mb-(--prose-spacing);
 }
 
 @utility prose-spacing-* {
