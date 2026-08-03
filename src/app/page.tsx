@@ -22,6 +22,12 @@ async function Page() {
       </TwoColumns.Left>
       <TwoColumns.Right className="prose collapse-inside">
         <H2>Portfolio</H2>
+        <Card title="ReportPrint" href="https://github.com/BenoitHiller/report_print" tags="Ruby">
+          <p>A hybrid between PrettyPrint and AwesomePrint/AmazingPrint.</p>
+          <p>
+            Providing both a stylish readable default, and the ability to customize it as needed.
+          </p>
+        </Card>
         <Card
           title="benoithiller.com"
           href="https://github.com/BenoitHiller/benoithiller.com"
