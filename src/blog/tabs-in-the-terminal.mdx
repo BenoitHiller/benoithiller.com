@@ -1,0 +1,98 @@
+import { Info } from '@/components/Info';
+import { Reference } from '@/components/Citation';
+
+export const metadata = {
+  title: 'Tabs in the Terminal',
+  description: 'Taking a detailed look at how and why terminals render tabs the way they do.',
+  publishedAt: new Date("2026-08-04T11:28:00-04:00"),
+  references: [
+    {
+      type: 'print-manual',
+      title: 'VT102 Programming Reference Card',
+      edition: 'EK-VT102-RC-001',
+      company: 'Digital Equipment Corporation',
+      city: 'Maynard',
+      state: 'MA',
+      country: 'USA',
+      year: 1981
+    },
+    {
+      type: 'digital-manual',
+      title: 'XTerm Control Sequences',
+      author: 'E. Moy, S. Gildea, and T. Dickey',
+      url: 'https://invisible-island.net/xterm/ctlseqs/ctlseqs.html',
+      year: 2026,
+      accessed: 'Aug. 4, 2026'
+    }
+  ]
+}
+
+Recently I was wondering how terminals actually render tab characters. As, if you've spent much time in a terminal, you've probably noticed the way they render with variable width.
+
+The purpose of that behaviour is mostly obvious, it is meant to enable writing out a table with fixed width columns. The exact details are however significant and they have implications for things like programmers trying to use tabs for indentation.
+
+## How Tabs Work
+
+Most modern terminal emulators are specifically emulating the behaviour of some descendant of the DEC VT102 terminal specifically. In the reference card for the VT102 it describes how a tab character is rendered by the terminal <Reference n={1} />.
+
+> This character moves the cursor to the next tab stop, or to the right margin if there are no more tab stops.
+
+The default tab stops are: starting with column 9, every 8 columns <Reference n={2} />.
+
+I say *default* because you can actually customize them, just like the tab stops in a rich text editor. If the terminal gets the sequence `ESC H` it will add a tab stop in the column where the cursor is currently located.
+
+<Info>
+When talking about escape sequences the character `ESC` will be mentioned often. This is actually the character produced by pressing the escape key on the keyboard, but you may notice that pressing escape doesn't produce a character or trigger most escape sequences.
+
+The reason you can't use the escape button to type `ESC` is because it is treated as a special character on input as well as on output. It will actually be treated the same as the `Meta` key (usually `Alt`) by the terminal in most cases. So for example pressing `ESC .` will paste the last argument of the previous command.
+
+To render `ESC` you need to print the ASCII character `0x1B`, so all of the following work depending on what styles of escapes any given tool supports `\x1B`, `\u1B`, `\033`, and `\e` (that last one is more rarely supported though).
+</Info>
+
+## Where Things Get Wacky
+
+Where things get a bit wacky is that the terminal doesn't have to render anything in particular in the space between the tab stops.
+
+In the following example I'm using `echo -e` to print `1 \t2` with a blue background and black characters. The result below is what I get when I copy the text from the terminal with control characters included.
+
+```ansi
+[1m[94mbhiller[22m[39m@ubuntu [1m~[22m % echo -e "\e[44m\e[30m1 \t2\e[0m"[30m[44m
+1 [39m[49m      [30m[44m2[1m[94m[49m
+bhiller[22m[39m@ubuntu [1m~[22m %[0m
+```
+
+If you try selecting the text above you will see that the output rendered the tab using spaces.
+
+Tabs are just one of many ways to move the cursor around in the terminal, and thus the reasonable way to handle copying the empty space between characters rendered at arbitrary positions is unfortunately to simply translate that empty space into space characters.
+
+In the above example you can see how the cursor moves without rendering, as the background isn't rendered in the empty space.
+
+### Implementation Differences
+
+The behaviour of copying out spaces is actually implementation dependent. In Gnome Terminal, for example, they use some clever heuristics to make it such that the text you copy is *usually* the exact text that was written to the terminal.
+
+We can however see in the following example that, if you are doing anything more complicated than writing printable text, you can cause it to fall back on rendering the space as spaces.
+
+```ansi
+[1m[94mbhiller[22m[39m@gnome-terminal [1m~[22m % echo -e "\e[44m\e[30m1 \t2\e[0m"[30m[44m
+1 [39m[49m	[30m[44m2[1m[94m[49m
+bhiller[22m[39m@gnome-terminal [1m~[22m % echo -e "\e[44m\e[30m1 \t2\e[3DX\e[0m"[30m[44m
+1 [39m[49m    [30m[44mX[39m[49m [30m[44m2[1m[94m[49m
+bhiller[22m[39m@gnome-terminal [1m~[22m %[0m
+```
+
+<Info>
+The sequence `CSI 3 D` in the above moves the cursor 3 spaces backwards.
+
+Where `CSI` is the Control Sequence Introducer, which is the fancy way to refer to the sequence `ESC [`.
+</Info>
+
+## Indenting Code
+
+At the start I mentioned the implications for indenting code. I say that because the above behaviour is a bit of a problem for programmers using command line tools on code indented with tabs.
+
+If you use `diff` or `grep` then copy the output of that back into your editor you can easily end up replacing tabs with spaces.
+
+Honestly this leaves me perplexed as to why anyone considered using tabs for indentation at any point in my lifetime. There has never been any associated upside which is worth friction of any kind, and this will have been a problem for a very long time now.
+
+I guess this is another case of engineers having an idea that sounds nice when described in brief, but that gets ripped to shreds by edge cases when exposed to the infuriating complexity of software.
