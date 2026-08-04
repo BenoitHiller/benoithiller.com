@@ -24,6 +24,7 @@ interface Metadata {
 interface BlogPost {
   slug: string;
   title?: string;
+  draft: boolean;
   references?: Citation[];
   description?: string;
   Component: React.FC;
@@ -72,19 +73,25 @@ const get: (slug: string[] | string) => Promise<BlogPost> = cache(async (slug) =
 
   const { title, references, description, publishedAt } = metadata ?? {};
 
+  const filepath = path.join(process.env.blogPath!, `${slugPath}.mdx`);
+
   // For drafts skip looking them up in git.
   if (slugPath.startsWith('drafts/')) {
+    const stats = await fs.stat(filepath);
+
     return {
       slug: slugPath,
       title,
+      draft: true,
       references,
       description,
       Component,
-      tableOfContents
+      tableOfContents,
+      publishedAt: stats.mtime,
+      updatedAt: stats.mtime
     };
   }
 
-  const filepath = path.join(process.env.blogPath!, `${slugPath}.mdx`);
   const gitRoot = process.env.rootPath!;
   const relativePath = path.relative(gitRoot, filepath);
 
@@ -110,6 +117,7 @@ const get: (slug: string[] | string) => Promise<BlogPost> = cache(async (slug) =
   return {
     slug: slugPath,
     title,
+    draft: false,
     references,
     description,
     Component,
@@ -129,10 +137,8 @@ const list: () => Promise<BlogPost[]> = cache(async () => {
   });
 
   const posts = await Promise.all(postPromises);
-  // Note: at some point it will make sense to add filtering of unpublished
-  // posts. For now they are just not pushed up to the main branch.
   return R.sort(
-    R.descend<BlogPost>(({ publishedAt }) => publishedAt?.valueOf() ?? Infinity),
+    R.descend<BlogPost>(({ publishedAt, updatedAt }) => publishedAt?.valueOf() ?? updatedAt?.valueOf() ?? -Infinity),
     posts
   );
 });

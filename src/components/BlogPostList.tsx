@@ -7,12 +7,13 @@ const PostList = async () => {
 
   return (
     <div>
-      {posts.map(({ title, publishedAt, slug, description }) => (
+      {posts.map(({ title, draft, publishedAt, slug, description }) => (
         <Card
           key={slug}
           title={title ?? slug}
           subTitle={publishedAt && <Datestamp value={publishedAt} />}
           href={`/blog/${slug}`}
+          tags={draft ? "Draft" : undefined}
         >
           {description}
         </Card>
