@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import 'katex/dist/katex.min.css';
+import localFont from 'next/font/local';
+import '@/vendor/Temml-Latin-Modern.css';
 
 import TableOfContents from './TableOfContents';
 import Footer from './Footer';
@@ -9,6 +10,11 @@ import { Bibliography, CitationProvider } from '@/components/Citation';
 import * as blogDb from '@/data/blog';
 
 export const dynamicParams = false;
+
+const latinModernMath = localFont({
+  variable: '--font-math',
+  src: '../../../vendor/latinmodern-math-1959/otf/latinmodern-math.otf'
+})
 
 async function generateStaticParams() {
   const paths = await blogDb.listFiles();
@@ -42,7 +48,7 @@ async function Page({ params }: PageProps<'/blog/[...slug]'>) {
           />
         </TwoColumns.Left>
         <TwoColumns.Right Element="article" className="md:max-w2-100%/80">
-          <div className="prose max-sm:w-full">
+          <div className={`prose max-sm:w-full ${latinModernMath.variable}`}>
             <h1>{title ?? slug.join('/')}</h1>
             <Component />
             {references && <Bibliography />}

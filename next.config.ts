@@ -1,7 +1,7 @@
 import path from 'path';
 import type { NextConfig } from 'next';
 import createMDX from '@next/mdx';
-import type { KatexOptions } from 'katex';
+import type { Options as TemmlOptions } from 'temml';
 
 const rootPath = path.resolve(__dirname);
 const development = process.env.NODE_ENV === 'development';
@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
   }
 };
 
-const katexOptions: KatexOptions = {
+const mathOptions: TemmlOptions = {
   strict: false,
   macros: {
     '\\|': '\\,|\\,'
@@ -38,7 +38,7 @@ const katexOptions: KatexOptions = {
 
 const rehypePlugins = [
   ['rehype-slug'],
-  ['rehype-katex', katexOptions],
+  ['@daiji256/rehype-mathml', mathOptions],
   ['@stefanprobst/rehype-extract-toc'],
   ['@stefanprobst/rehype-extract-toc/mdx'],
   ['rehype-mdx-code-props']

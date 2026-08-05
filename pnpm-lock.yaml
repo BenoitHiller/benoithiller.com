@@ -45,6 +45,9 @@ importers:
 
   .:
     dependencies:
+      '@daiji256/rehype-mathml':
+        specifier: ^1.2.2
+        version: 1.2.2
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@19.2.0)
@@ -75,9 +78,6 @@ importers:
       isomorphic-git:
         specifier: ^1.37.2
         version: 1.37.2
-      katex:
-        specifier: ^0.17.0
-        version: 0.17.0
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
@@ -99,9 +99,6 @@ importers:
       react-syntax-highlighter:
         specifier: ^16.1.1
         version: 16.1.1(react@19.2.0)
-      rehype-katex:
-        specifier: ^7.0.1
-        version: 7.0.1
       rehype-mdx-code-props:
         specifier: ^3.0.1
         version: 3.0.1
@@ -123,6 +120,9 @@ importers:
       tailwindcss:
         specifier: ^4.3.0
         version: 4.3.0
+      temml:
+        specifier: ^0.13.4
+        version: 0.13.4
       yaml-loader:
         specifier: ^0.8.1
         version: 0.8.1
@@ -259,6 +259,9 @@ packages:
   '@babel/types@8.0.4':
     resolution: {integrity: sha512-eY+Yn3dCqTGmyiq2QRU66lA5FL8lqqqvecHt0fF3uHONIa7ToYsaCiWV8lOKqAs0Rb2SjixiKFROngnulPtt2g==}
     engines: {node: ^22.18.0 || >=24.11.0}
+
+  '@daiji256/rehype-mathml@1.2.2':
+    resolution: {integrity: sha512-l4+Y47QAuCDdoD+j9r8+wvPMw3FxYk8NuUY3nc1qBbNTgMX6X3Xogkimlu7Zn2meLJ5cnwZTNupAEnURbWujsQ==}
 
   '@emnapi/core@1.8.1':
     resolution: {integrity: sha512-AvT9QFpxK0Zd8J0jopedNm+w/2fIzvtPKPjqyw9jwvBaReTTqPBk9Hixaz7KbjimP+QNz605/XnjFcDAL2pqBg==}
@@ -2068,10 +2071,6 @@ packages:
     resolution: {integrity: sha512-Eeo8Ys1doU1z+x8AZsPpQu+p/QcZBI5PeOo7QGQdy2x2m0MU/hYagBbGOmXwr5KVbEfVuWv9LpnQWeehogurjg==}
     hasBin: true
 
-  katex@0.17.0:
-    resolution: {integrity: sha512-Vdw0ATsQ9V+LuegM/BTwQqV/6cTl5lbGcIrU+BCgLxyf6bo38ybOr372tuSIxir3CN720flu1meYR6XzNMwQnw==}
-    hasBin: true
-
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
@@ -2704,9 +2703,6 @@ packages:
     resolution: {integrity: sha512-ZbgR5aZEdf4UKZVBPYIgaglBmSF2Hi94s2PcIHhRGFjKYu+chjJdYfHn4rt3hB6eCKLJ8giVIIfgMa1ehDfZKA==}
     engines: {node: '>=0.10.0'}
 
-  rehype-katex@7.0.1:
-    resolution: {integrity: sha512-OiM2wrZ/wuhKkigASodFoo8wimG3H12LWQaH8qSPVJn9apWKFSH3YOCtbKpBorTVw/eI7cuT21XBbvwEswbIOA==}
-
   rehype-mdx-code-props@3.0.1:
     resolution: {integrity: sha512-BWWKn0N6r7/qd7lbLgv5J8of7imz1l1PyCNoY7BH0AOR9JdJlQIfA9cKqTZVEb2h2GPKh473qrBajF0i01fq3A==}
 
@@ -2984,6 +2980,10 @@ packages:
   tapable@2.3.3:
     resolution: {integrity: sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==}
     engines: {node: '>=6'}
+
+  temml@0.13.4:
+    resolution: {integrity: sha512-k1yolMBswx34Jw9hZn5Xh2/GBlwqlW+wiN7QaUYUMhSa1ypfti6rlCfSmCxWyooxH1G32C/Z+qVvgAsBOELZBQ==}
+    engines: {node: '>=18.13.0'}
 
   tinyglobby@0.2.15:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
@@ -3285,6 +3285,15 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 8.0.0
       '@babel/helper-validator-identifier': 8.0.4
+
+  '@daiji256/rehype-mathml@1.2.2':
+    dependencies:
+      '@types/hast': 3.0.4
+      hast-util-from-html-isomorphic: 2.0.0
+      hast-util-to-text: 4.0.2
+      temml: 0.13.4
+      unified: 11.0.5
+      unist-util-visit-parents: 6.0.2
 
   '@emnapi/core@1.8.1':
     dependencies:
@@ -5241,10 +5250,6 @@ snapshots:
     dependencies:
       commander: 8.3.0
 
-  katex@0.17.0:
-    dependencies:
-      commander: 8.3.0
-
   keyv@4.5.4:
     dependencies:
       json-buffer: 3.0.1
@@ -6158,16 +6163,6 @@ snapshots:
     dependencies:
       rc: 1.2.8
 
-  rehype-katex@7.0.1:
-    dependencies:
-      '@types/hast': 3.0.4
-      '@types/katex': 0.16.8
-      hast-util-from-html-isomorphic: 2.0.0
-      hast-util-to-text: 4.0.2
-      katex: 0.16.47
-      unist-util-visit-parents: 6.0.2
-      vfile: 6.0.3
-
   rehype-mdx-code-props@3.0.1:
     dependencies:
       '@types/hast': 3.0.4
@@ -6577,6 +6572,8 @@ snapshots:
   tailwindcss@4.3.0: {}
 
   tapable@2.3.3: {}
+
+  temml@0.13.4: {}
 
   tinyglobby@0.2.15:
     dependencies:
