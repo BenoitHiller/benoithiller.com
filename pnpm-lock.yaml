@@ -67,8 +67,8 @@ importers:
         specifier: ^4.3.0
         version: 4.3.0
       '@viz-js/viz':
-        specifier: ^3.24.0
-        version: 3.24.0
+        specifier: ^3.29.0
+        version: 3.29.0
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -993,8 +993,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@viz-js/viz@3.24.0':
-    resolution: {integrity: sha512-sTRz2cFN6PwICVC7GVlF2aYNAZ/LwF7Y1mp3B+8LXQ7otyHrzQYSzNBwJ4lctL/aS3x97ppw59z6zIW+wPs6bQ==}
+  '@viz-js/viz@3.29.0':
+    resolution: {integrity: sha512-iq4MTqNCr8pinP4C73JRFx/h2w4QbtHvXINNiPeBv3/C5tSamXwakst6ODlR/l6uh3/SGr7IAGIfSk2qMekiNw==}
 
   '@zeit/schemas@2.36.0':
     resolution: {integrity: sha512-7kjMwcChYEzMKjeex9ZFXkt1AyNov9R5HZtjBKVsmVpw7pa7ZtlCGvCBC2vnnXctaYN+aRI61HjIqeetZW5ROg==}
@@ -3952,7 +3952,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@viz-js/viz@3.24.0': {}
+  '@viz-js/viz@3.29.0': {}
 
   '@zeit/schemas@2.36.0': {}
 
