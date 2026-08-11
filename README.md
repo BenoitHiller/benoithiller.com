@@ -20,8 +20,6 @@ pnpm dev
 
 ### Building
 
-The project will build and deploy itself to GitHub Pages using the action configured in [.github/workflows/deploy.yml](.github/workflows/deploy.yml) when a commit is pushed to `main`.
-
 To build the project locally use:
 
 ```bash
