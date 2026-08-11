@@ -231,6 +231,25 @@ const MastersThesis: React.FC<CitationProps<'masters-thesis'>> = (props) => {
   return writer.render();
 };
 
+const PhdThesis: React.FC<CitationProps<'phd-thesis'>> = (props) => {
+  const writer = new CitationWriter(props);
+
+  writer.format('author', '%s,');
+  writer.format('title', '"%s,"');
+  writer.write(' Ph.D. dissertation,');
+  writer.format('school', '%s,');
+  writer.format('city', '%s,');
+  writer.format('state', '%s,');
+  writer.format('country', '%s,');
+  writer.format('month', '%s,');
+  writer.format('day', '%s,');
+  writer.format('year', '%s');
+  writer.write('.');
+  writer.format('url', '[Online]. Available: %url');
+
+  return writer.render();
+};
+
 const PrintManual: React.FC<CitationProps<'print-manual'>> = (props) => {
   const writer = new CitationWriter(props);
 
@@ -277,6 +296,8 @@ const Writer: React.FC<{ citation: Citation }> = ({ citation }) => {
       return <LectureNotes {...citation} />;
     case 'masters-thesis':
       return <MastersThesis {...citation} />;
+    case 'phd-thesis':
+      return <PhdThesis {...citation} />;
     case 'print-manual':
       return <PrintManual {...citation} />;
     case 'digital-manual':

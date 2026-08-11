@@ -14,6 +14,7 @@ type Citation = {
   | GovernmentProceedingProps
   | LectureNotesProps
   | MastersThesisProps
+  | PhdThesisProps
   | PrintManualProps
   | DigitalManualProps
 );
@@ -94,6 +95,19 @@ interface GovernmentActProps {
 
 interface MastersThesisProps {
   type: 'masters-thesis';
+  author: string;
+  year: string;
+  school: string;
+  country?: string;
+  state?: string;
+  city?: string;
+  month?: string;
+  day?: string;
+  url?: string;
+}
+
+interface PhdThesisProps {
+  type: 'phd-thesis';
   author: string;
   year: string;
   school: string;
