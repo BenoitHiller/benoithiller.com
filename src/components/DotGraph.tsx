@@ -7,16 +7,24 @@ import styles from './DotGraph.module.css';
 const promise = instance();
 
 // Due to https://gitlab.com/graphviz/graphviz/-/issues/867 graphviz svgs
-// render scaled up 33%. I'm hoping that just gets fixed soon so that I don't
-// have to open up the output and adjust the height and width values.
+// render scaled up 33%.
 //
-// That means for now if I want the text to match the body text I need to set
-// it as 12 (to get scaled up to 16).
+// Now that I've started running into issues with layout as a result of the incorrect scaling,
+// rather than just font rendering problems, I've given in and done the following to remove the
+// incorrect use of `pt` in the output sizes.
+//
+// This is in general a very brittle way to do this, but given that the output of viz-js is
+// consistent about how it renders these attributes. This code will be stable at least given that
+// the viz-js version and most of the configuration options are unchanged.
+function fixSizes(input: string): string {
+  return input.replace(/<svg width="([^"]*)pt" height="([^"]*)pt"/, '<svg width="$1" height="$2"');
+}
+
 const vizConfig: RenderOptions = {
   format: 'svg_inline',
-  graphAttributes: { fontsize: 12, bgcolor: 'transparent' },
-  nodeAttributes: { fontsize: 12, penwidth: 0.5 },
-  edgeAttributes: { fontsize: 12, penwidth: 0.5 }
+  graphAttributes: { fontsize: "18.0", bgcolor: 'transparent' },
+  nodeAttributes: { fontsize: "18.0" },
+  edgeAttributes: { fontsize: "18.0" }
 };
 
 const DotGraph: React.FC<{ children: string; meta: { title?: string } }> = ({
@@ -31,8 +39,8 @@ const DotGraph: React.FC<{ children: string; meta: { title?: string } }> = ({
     return (
       <figure className={`prose-spacing ${styles.graph}`}>
         <div
-          className="w-full *:w-full font-mono font-semibold text-[12px]"
-          dangerouslySetInnerHTML={{ __html: svg.output }}
+          className="w-full *:w-full font-mono text-[18px]"
+          dangerouslySetInnerHTML={{ __html: fixSizes(svg.output) }}
         />
         {title && <figcaption className="mt-3 text-center">{title}</figcaption>}
       </figure>
