@@ -253,6 +253,30 @@ pre > code.language-ansi {
   }
 }
 
+@utility dot-nudge-label-x-* {
+  text {
+    transform: translateX(calc(1em * --value(number)));
+  }
+}
+
+@utility -dot-nudge-label-x-* {
+  text {
+    transform: translateX(calc(-1em * --value(number)));
+  }
+}
+
+@utility dot-nudge-label-y-* {
+  text {
+    transform: translateY(calc(1em * --value(number)));
+  }
+}
+
+@utility -dot-nudge-label-y-* {
+  text {
+    transform: translateY(calc(-1em * --value(number)));
+  }
+}
+
 @utility expand-l-* {
   padding-left: --spacing(--value(integer));
   margin-left: --spacing(--value(integer) * -1);
