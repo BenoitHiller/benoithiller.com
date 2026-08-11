@@ -240,8 +240,10 @@ pre > code.language-ansi {
 
 @utility svg-color-* {
   polygon, path, ellipse {
-    fill: --value(--color-*) !important;
     stroke: --value(--color-*) !important;
+  }
+  polygon, ellipse {
+    fill: --value(--color-*) !important;
   }
 }
 
