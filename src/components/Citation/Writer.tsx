@@ -278,6 +278,20 @@ const DigitalManual: React.FC<CitationProps<'digital-manual'>> = (props) => {
   return writer.render();
 };
 
+const Software: React.FC<CitationProps<'software'>> = (props) => {
+  const writer = new CitationWriter(props);
+
+  writer.format('author', '%s.');
+  writer.format('title', '%italic.');
+  writer.format('year', '(%s).');
+  writer.format('version', '(%s).');
+  writer.format('publisher', '%s.');
+  writer.format('accessed', 'Accessed: %s.');
+  writer.format('url', '[Online]. Available: %url.');
+
+  return writer.render();
+};
+
 const Writer: React.FC<{ citation: Citation }> = ({ citation }) => {
   switch (citation.type) {
     case 'article':
@@ -302,6 +316,8 @@ const Writer: React.FC<{ citation: Citation }> = ({ citation }) => {
       return <PrintManual {...citation} />;
     case 'digital-manual':
       return <DigitalManual {...citation} />;
+    case 'software':
+      return <Software {...citation} />;
   }
 };
 

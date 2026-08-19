@@ -17,6 +17,7 @@ type Citation = {
   | PhdThesisProps
   | PrintManualProps
   | DigitalManualProps
+  | SoftwareProps
 );
 
 type CitationProps<T extends string> = Citation & { type: T };
@@ -135,6 +136,14 @@ interface DigitalManualProps {
   edition?: string;
   accessed?: string;
   url: string;
+}
+
+interface SoftwareProps {
+  type: 'softwre';
+  version?: string;
+  publisher?: string;
+  accessed?: string;
+  url?: string;
 }
 
 export { Bibliography, Reference, CitationProvider };
