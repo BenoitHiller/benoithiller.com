@@ -4,6 +4,7 @@
 @theme inline {
   --font-sans: var(--font-mplus), sans serif;
   --font-mono: var(--font-cascadia), monospace;
+  --font-math: var(--font-math), monospace;
 
   --color-body-background: hsl(210, 40%, 99%);;
   --color-body-text: var(--color-gray-700);
