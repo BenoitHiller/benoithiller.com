@@ -4,8 +4,9 @@ import React, { useContext, useMemo } from 'react';
 import type { Citation } from '.';
 import CitationWriter from './Writer';
 import { H2 } from '@/components/BlogHeading';
+import * as R from 'ramda';
 
-type CitationPlus = Citation & { authorKey: string | null };
+type CitationPlus = Citation & { authorKey: string[] };
 
 const CitationContext = React.createContext<CitationPlus[]>([]);
 
@@ -40,52 +41,84 @@ class Name {
   }
 }
 
-function getAuthorKey(input: string | undefined): string | null {
+function getAuthorKey(input: string | undefined): string[] {
   if (!input) {
-    return null;
+    return [];
   }
 
   const processed = input.replace(/(, )?et al.$/, ', ...');
 
   const parts = processed.split(/,\s*|,?\s*and\s*/);
   const keys = parts.map((part) => part.replace(/^.* /, ''));
-  return keys.filter((value) => !!value).join(',');
+  return keys.filter((value) => !!value);
 }
 
 function findReference(references: CitationPlus[], author: string): number {
   const searchKey = getAuthorKey(author);
-  return references.findIndex((reference) => reference.authorKey == searchKey);
+  return references.findIndex((reference) => R.equals(reference.authorKey, searchKey));
 }
 
-type ReferenceProps = { n: number } | { author: string };
+function formatAuthor(input: string[]): string | undefined {
+  if (input.length <= 1) {
+    return input[0];
+  } else if (input.length < 3) {
+    return input[0] + ' and ' + input[1];
+  } else {
+    return input.slice(0, -1).join(', ') + ', and ' + input.at(-1);
+  }
+}
+
+type ReferenceSpecifier = { n: number } | { author: string };
+type ReferenceProps = ReferenceSpecifier & {
+  style?: "minimal" | "author",
+  details?: string
+};
 
 const Reference: React.FC<ReferenceProps> = (props) => {
   const references = useContext(CitationContext);
-
+  const { details } = props;
+  let index: number;
+  let style = props.style;
   if ('n' in props) {
-    const n = props.n;
-
-    return (
-      <a href={`#citation-${n}`} className="invisible-link">
-        [{n}]
-      </a>
-    );
+    index = props.n - 1;
+    style ||= 'minimal';
   } else {
     const { author } = props;
-    const match = findReference(references, author);
-    if (match < 0) {
-      return <>[Citation Needed]</>;
-    }
+    index = findReference(references, author);
+    style ||= 'author';
+  }
 
-    const n = match + 1;
-    return (
-      <>
-        {author}{' '}
-        <a href={`#citation-${n}`} className="invisible-link">
-          [{n}]
+  const reference = references[index];
+
+  if (!reference) {
+    return <>[Citation Needed]</>;
+  }
+
+  // displayed citation numbers are 1 indexed
+  index += 1;
+
+  let refString = `${index}`;
+  if (details) {
+    refString += `, ${details}`
+  }
+
+  switch(style) {
+    case 'author':
+      const { authorKey } = reference;
+      return (
+        <>
+          {formatAuthor(authorKey)}{' '}
+          <a href={`#citation-${index}`} className="invisible-link">
+            [{refString}]
+          </a>
+        </>
+      );
+    case 'minimal':
+      return (
+        <a href={`#citation-${index}`} className="invisible-link">
+          [{refString}]
         </a>
-      </>
-    );
+      );
   }
 };
 
