@@ -22,12 +22,23 @@ const Table: React.FC<React.ComponentPropsWithoutRef<'table'> & { align?: 'left'
 const THead: React.FC<React.ComponentPropsWithoutRef<'thead'>> = (props) => (
   <thead className="bg-slate-100" {...props} />
 );
+const TBody: React.FC<React.ComponentPropsWithoutRef<'tbody'>> = ({ className, ...props }) => (
+  <tbody className={`bg-white ${className}`} {...props} />
+);
 const TH: React.FC<React.ComponentPropsWithoutRef<'th'>> = ({ className, ...props }) => (
   <th className={classNames('p-3', 'border', 'border-gray-300', 'w-[3em]', className)} {...props} />
 );
 const TD: React.FC<React.ComponentPropsWithoutRef<'td'>> = ({ className, ...props }) => (
   <td className={`p-3 border border-gray-300 ${className}`} {...props} />
 );
+const TR: React.FC<React.ComponentPropsWithoutRef<'tr'>> = ({ className, ...props }) => (
+  <tr className={`break-inside-avoid ${className}`} {...props} />
+);
+
+const Caption: React.FC<React.ComponentPropsWithoutRef<'caption'>> = ({ className, ...props }) => (
+  <caption className={`p-3 bg-slate-100 border-x border-t border-gray-300 font-bold ${className}`} {...props} />
+);
+
 
 const Head: React.FC<{
   headings: (string | HeadingGroup)[];
@@ -114,16 +125,16 @@ const Body: React.FC<{
   const rows = data.split(rowDelimiter).map((row) => row.split(columnDelimiter).slice(1, -1));
 
   return (
-    <tbody className="bg-white">
+    <TBody>
       {rows.map((row, i) => (
-        <tr className="break-inside-avoid" key={i}>
+        <TR key={i}>
           {row.map((column, j) => (
             <TD key={`${i},${j}`}>{column}</TD>
           ))}
-        </tr>
+        </TR>
       ))}
-    </tbody>
+    </TBody>
   );
 };
 
-export { Head, Body, Table };
+export { Head, Body, Table, Caption, THead, TBody, TR, TH, TD };
