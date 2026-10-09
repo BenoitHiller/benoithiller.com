@@ -1,0 +1,3 @@
+[submodule "src/app/parsing/_lr_examples"]
+	path = src/app/parsing/_lr_examples
+	url = git@github.com:BenoitHiller/lr_examples.git
