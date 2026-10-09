@@ -1,0 +1,91 @@
+import { Info, Note, Warning, Focus } from '@/components/Info';
+import { Reference, CitationProvider, Bibliography } from '@/components/Citation';
+import Link from 'next/link';
+import Card from '@/components/Card';
+
+<CitationProvider value={[
+  {
+    type: "article",
+    author: "F. DeRemer and T. Pennello",
+    title: "Efficient Computation of LALR(1) Look-Ahead sets",
+    journal: "ACM Transactions on Programming Languages and Systems",
+    volume: 4,
+    number: 4,
+    year: "1982",
+    month: "Oct",
+    pages: "615-649",
+    doi: "https://doi.org/10.1145/69622.357187",
+  },
+  {
+    type: "conference-proceedings",
+    author: "J. E. Denny and B. A. Malloy",
+    title: "IELR(1): practical LR(1) parser tables for non-LR(1) grammars with conflict resolution",
+    conference: "ACM symposium on Applied computing",
+    year: "2008",
+    pages: "240-245",
+    doi: "https://doi.org/10.1145/1363686.1363747"
+  }
+]}>
+
+When doing my own research into `LR` parser generation all of the sources I reviewed presented only a limited slice of the information required to get all the way to a working implementation.
+
+So what I'm hoping to do is to provide a reference with every detail necessary to go from nothing all the way to a complete `LR` parser.
+
+Specifically I'm going to describe how to get to a `LALR(1)` parser using the algorithm created by <Reference author="DeRemer and Pennello" />.
+
+Then later I'm going to build up to a `IELR(1)` parser generation algorithm which expands on `LALR` to be able to parse all `LR` grammars <Reference style="minimal" author="Denny and Malloy"/>.
+
+## Chapters
+
+To build up even to `LALR(1)` however we need to lay some groundwork first. The content is thus split into the following chapters:
+
+<Card
+  title="1. Definitions"
+  href="/parsing/definitions"
+>
+  Some basic definitions of terms and notation used throughout the subsequence chapters.
+</Card>
+
+<Card
+  title="2. LR(0)"
+  href="/parsing/lr0"
+>
+  The process of constructing a `LR(0)` parser from a grammar.
+
+  Also covered:
+
+  * Definitions of _parse tables_ and parser _items_
+  * The $Closure$ of a set of _items_
+</Card>
+
+<Card
+  title="3. LALR(1)"
+  href="/parsing/lalr"
+>
+  The process of constructing a `LALR(1)` parser from the `LR(0)` parser.
+
+  Also covered:
+
+  * The `Digraph` algorithm
+</Card>
+
+<Card
+  title="4. Parse Table Compression (Coming Soon)"
+  href="#"
+>
+  The base/check algorithm for producing a more dense representation of the tables defining the state transitions of `LR` parsers.
+</Card>
+
+<Card
+  title="5. IELR(1) (Coming Soon)"
+  href="#"
+>
+  The process of constructing a `IELR(1)` parser from the `LALR(0)` parser.
+</Card>
+
+<Note>
+Each chapter does very much build on the ones before it. So if you ever find yourself wondering "but what does [term]" mean, either it is defined in a previous chapter or I've made a mistake and would be happy to receive a bug report about it.
+</Note>
+
+<Bibliography />
+</CitationProvider>

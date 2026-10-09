@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   env: {
     blogPath: path.resolve(__dirname, 'src/blog'),
+    articlePath: path.resolve(__dirname, 'src/app/parsing/(articles)'),
     rootPath,
     fallbackLocale: 'en-US',
     fallbackTimeZone: 'America/Toronto'

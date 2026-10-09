@@ -1,0 +1,651 @@
+import { Info, Note, Warning, Focus } from '@/components/Info';
+import * as Citation from '@/components/Citation';
+import * as Table from '@/components/DataTable';
+import { Bibliography, CitationProvider } from '@/components/Citation';
+
+export const metadata = {
+  title: 'Parsing 3: LALR(1)'
+};
+
+<CitationProvider value={[
+  {
+    type: "article",
+    author: "F. DeRemer and T. Pennello",
+    title: "Efficient Computation of LALR(1) Look-Ahead sets",
+    journal: "ACM Transactions on Programming Languages and Systems",
+    volume: 4,
+    number: 4,
+    year: "1982",
+    month: "Oct",
+    pages: "615-649",
+    doi: "https://doi.org/10.1145/69622.357187",
+  }
+]}>
+
+A `LALR(1)` parser refers to a `L`ook-`A`head `LR` parser(with 1 token of lookahead).
+
+Specifically a `LALR(1)` parser adds lookahead to a `LR(0)` parser keeping the same set of underlying states. This grants a substantial portion of the additional recognition power of `LR(1)`.
+
+In addition to the parser states being unchanged, the $Next(\rho, \Tau)$ function from the `LR(0)` parser is also used as is, but with $\Tau$ now referring to the lookahead token rather than the shift token.
+
+What we need to compute is thus the values of the function $Reduce_1(\rho, \Tau)$, which are the reductions to perform in a state $\rho$ given that the lookahead token is $\Tau$ (where $\Tau$ is a terminal).
+
+<Info>
+Thus if we defined $Reduce_1$ for a `LR(0)` parser we would do so as follows:
+
+```math
+Reduce_1(\rho, \Tau) = Reduce_0(\rho)
+```
+
+Completely ignoring $\Tau$ like this should remind you of how back in the section on parse tables I mentioned the convention of filling in the reduction for every possible token in a row.
+</Info>
+
+### Definitions
+
+We compute $Reduce_1$ through a series of steps which are described by the following equations, such that each step depends on the one below it.
+
+This is going to be a lot all at once so it will likely be more useful as something to come back and refer to rather than an overview of what is to come.
+
+```math
+\begin{align*}
+Reduce_1(\rho, \Tau) &= \{ \Alpha \rightarrow \omega\in \mathbb{P} \| \Tau \in LA(\rho, \Alpha \rightarrow \omega) \} \\
+
+LA(\rho, \Alpha \rightarrow \omega) &= \bigcup_{\sigma\in \mathbb{S}} \{
+  Follow(\sigma, \Alpha) \| (\rho, \Alpha \rightarrow \omega)\ \bm{lookback}\ (\sigma, \Alpha)
+\} \\
+
+Follow(\rho, \Alpha) &= Read(\rho, \Alpha) \cup \bigcup_{
+  \begin{subarray}{c}
+    \sigma\in\mathbb{S}\\
+    \Beta\in\mathbb{N}
+  \end{subarray}
+} \{
+  Follow(\sigma, \Beta) \| (\rho, \Alpha)\ \bm{includes}\ (\sigma, \Beta)
+\} \\
+
+Read(\rho, \Alpha) &= DR(\rho, \Alpha) \cup \bigcup_{
+\begin{subarray}{c}
+  \sigma\in\mathbb{S}\\
+  \Beta\in\mathbb{N}
+\end{subarray}
+} \{
+  Read(\sigma, \Beta) \| (\rho, \Alpha)\ \bm{reads}\ (\sigma, \Beta)
+\} \\
+
+DR(\rho, \Alpha) &= \{ \Tau \in \mathbb{T} \| \rho\xmapsto{\Alpha}\sigma\xmapsto{\Tau} \}
+\end{align*}
+```
+
+<Focus>
+To explain all of the new notation introduced above.
+
+$\bigcup\{\dots\}$ is the recursive union of all of the specified sets, which will be explained further as we describe the Digraph algorithm for computing it.
+
+$\rho\xmapsto{\Alpha}$ represents the transition from state $\rho$ for the token $\Alpha$. Such that appearing to the right of the $|$ means that the expression to the left is conditional on the existence of such a transition.
+
+$LA$ is short for Look Ahead.
+
+$DR$ is short for Directly Reads, and it is the set of terminals that can be read directly after a given non-terminal transition.
+
+$(\rho, \Alpha \rightarrow \omega)\ \bm{lookback}\ (\sigma, \Alpha)$, $(\rho, \Alpha)\ \bm{includes}\ (\sigma, \Beta)$ and $(\rho, \Alpha)\ \bm{reads}\ (\sigma, \Beta)$ mean that there exist edges defined by the $\bm{lookback}$, $\bm{includes}$ and $\bm{reads}$ relations respectively.
+
+Here *relation* refers specifically to such a set of edges between edges (or alternatively a function from pairs to pairs). We will get to explaining these in a moment.
+</Focus>
+
+### Relations
+
+To compute $LA$ we now need to determine values for the $\bm{lookback}$, $\bm{includes}$ and $\bm{reads}$ relations. Like $DR$ these can be deduced from the `LR(0)` parser.
+
+We define $\bm{reads}$ such that $(\rho, \Alpha)\ \bm{reads}\ (\sigma, \Beta)$ if and only if all of the following are true
+
+```math
+\begin{align*}
+&\rho\xmapsto{\Alpha}\sigma \\
+&\sigma\xmapsto{\Beta} \\
+&\Beta\Rightarrow^\ast\epsilon
+\end{align*}
+```
+
+<Focus>
+Where $\Beta$ and $\Alpha$ are non-terminals and $\rho$ and $\sigma$ are states.
+
+The notation $\Beta\Rightarrow^\ast\epsilon$ means that there exists some sequence of productions starting at $\epsilon$ and resulting in $\Beta$.
+</Focus>
+
+This is used in the $Read$ function above to define the full list of terminals which can be the next terminal read after a given non-terminal transition.
+
+As for what this looks like we can have a look at the graph generated for the following grammar:
+
+```txt title="Grammar 4"
+S -> E
+
+E -> F C D E
+E -> "e"
+
+F ->
+C ->
+D ->
+```
+
+```dot title="Grammar 4 parser with reads relation"
+digraph Parser {
+  graph [layout=neato,pad="0.25,0.1"];
+
+  node [shape=circle,pin=true,fixedsize="shape",width=0.75,height=0.75];
+  edge [labelangle=0,labeldistance=0];
+
+  0[pos="-3,2"];
+  1[pos="-3,4"];
+  2[pos="-3,-2"];
+  3[pos="0,2"];
+  accept[pos="0,4",label="",shape=doublecircle];
+  4[pos="0,-2"];
+  5[pos="0,0"];
+  6[pos="3,0"];
+
+  {
+    node [shape=plaintext];
+
+    s0r4[label="F ->",pos="-2.4,1.5"];
+    s2r2[label="C ->",pos="-2.4,-2.5"];
+    s3r6[label="E -> \"e\"\l",pos="0.8,1.5"];
+    s4r3[label="D ->",pos="0.6,-2.5"];
+    s5r4[label="F ->",pos="0.6,-0.5"];
+    s6r5[label="E -> F C D E\r",pos="2.8,0.6"];
+  }
+
+  {
+    node [shape=none,fixedsize=true,width=0,height=0,label=""];
+
+    s0F[pos="-3,0"];
+    s2C[pos="-1.5,-2"];
+    s4D[pos="0,-1"]
+    s5F[pos="-1.5,-1"];
+  }
+
+  {
+    edge [arrowhead=none,labeldistance=1,labelangle=90];
+
+    0->s0F[headlabel="F"];
+    2->s2C[headlabel="C"];
+    4->s4D[headlabel="D"];
+    5->s5F[headlabel="F"];
+  }
+
+  0->1[label="E\l"];
+  s0F->2;
+  0->3[xlabel="\"e\""];
+  s2C->4;
+  s4D->5;
+  5->6[label="E"];
+  s5F->2;
+  5->3[headlabel="\"a\"",labelangle=15,labeldistance=6];
+
+  1->accept[label="$"];
+
+  {
+    edge [style=dashed,arrowhead=vee,class="svg-color-sky-600"];
+    s5F->s2C;
+    s0F->s2C;
+    s2C->s4D;
+    s4D->s5F;
+  }
+
+  subgraph cluster_legend {
+    Legend[shape=plaintext,pos="1.2,-1.3",label="Legend:\l",width=1];
+    reads[shape=plaintext,pos="1.2,-1.7",label="reads\l",width=1,class="svg-text-sky-600"];
+
+    left->right[style=dashed,arrowhead=vee,class="svg-color-sky-600"];
+    left[pos="1.8,-1.7",label="",style=invis,width=0,height=0];
+    right[pos="2.7,-1.7",label="",style=invis,width=0.3,height=0.1];
+  }
+}
+```
+
+We define $\bm{includes}$ such that $(\rho, \Alpha)\ \bm{includes}\ (\sigma, \Beta)$ if and only if all of the following are true.
+
+```math
+\begin{align*}
+  &\sigma \xrightarrow{\beta} \rho\\
+  &Next(\rho, \Alpha) \xrightarrow{\gamma}\tau\\
+  &\gamma\Rightarrow^*\epsilon\\
+  &\Beta\rightarrow\beta\Alpha\gamma \in Reduce_0(\tau)
+\end{align*}
+```
+
+<Focus>
+Where $\Beta$ and $\Alpha$ are non-terminals; $\rho$, $\sigma$, and $\tau$ are states; $\beta$ is a sequence of tokens; and $\gamma$ is a sequence of non-terminals.
+
+$\sigma \xrightarrow{\beta} \rho$ means that, given $\beta$ is some sequence of tokens, if we start at state $\sigma$ and follow the sequence of transitions labelled by the tokens of $\beta$, we arrive at state $\rho$. Note that if $\beta=\epsilon$ then $\sigma = \rho$ because traversing a path of length 0 means staying in place.
+
+$\gamma$ is allowed to be an empty string in the above, in which case $Next(\rho,\Alpha)=\tau$.
+
+$Reduce_0$ is from the associated `LR(0)` parser.
+</Focus>
+
+The $\bm{includes}$ relation captures what edges can follow the specified edge after taking into account backtracking from performing a reduction.
+
+```dot title="Diagramatic view of the relation"
+digraph Example {
+  rankdir=LR;
+  ranksep=1;
+  fontsize=22;
+  class="font-math text-[22px] font-normal";
+  edge [fontsize=22];
+  node [fontsize=22,shape=circle,fixedsize="shape",width=0.75,height=0.75];
+
+  o[label="σ"];
+  rest[label="",style=dashed,class="svg-stroke-gray-600"];
+  p[label="ρ"];
+  r[label="",style=dashed,class="svg-stroke-gray-600"]
+  t[label="τ"];
+  tlabel[style=invis,shape=point];
+
+  o->rest[weight=2,label="B"];
+  o->p[label="β",style=dashed,class="svg-color-gray-600"];
+  p->r[label="A"];
+  r->t[label="γ",style=dashed,class="svg-color-gray-600"];
+  t->tlabel[taillabel="B → βAγ\l",labeldistance=5,weight=2,color=transparent,arrowhead=none];
+}
+```
+
+The following is an example grammar and parser diagram to illustrate what $\bm{includes}$ looks like in practice.
+
+```txt title="Grammar 5"
+S -> E
+E -> "f" F
+E -> "e"
+
+F -> "g" G
+G -> "h" E
+```
+
+```dot title="Grammar 5 parser with includes relation"
+digraph Parser {
+  graph [layout=neato];
+  node [shape=circle,pin=true,fixedsize="shape",width=0.75,height=0.75];
+
+  0[pos="0,-6"];
+  1[pos="0,-1.5"];
+  accept[pos="0,0",label="",shape=doublecircle];
+
+  2[pos="2,-4"];
+  3[pos="2,0"];
+
+  4[pos="4,-3"];
+  5[pos="4,-1.5"];
+
+  6[pos="6,-4"];
+  7[pos="6,0"];
+
+  8[pos="6,-6"];
+
+  0->1[label="E\l",class="dot-nudge-label-x-1"];
+  0->2[label="\"b\""];
+  0->8[label="\"e\""];
+
+  2->3[label="F\l",class="dot-nudge-label-x-1"];
+  2->4[label="\"g\""];
+
+  4->6[label="\"h\"",class="dot-nudge-label-x-1.5"];
+
+  6->2[label="\"f\""];
+  6->7[label="E\l",class="dot-nudge-label-x-1"];
+  6->8[label="\"e\"\r",class="dot-nudge-label-x-2"];
+
+  {
+    edge [labelhangle=-12,labeldistance=2.5];
+
+    1->accept[headlabel="$"];
+
+    4->5[label="G\l",class="dot-nudge-label-x-1"];
+  }
+
+  {
+    edge [style=dashed,arrowhead=vee,class="svg-color-emerald-600"];
+    node [shape=point,style=invis,width=0,height=0];
+    A1[pos="6,-2.4"];
+    A2[pos="6,-0.8"];
+    A3[pos="0,-2.4"];
+
+    C[pos="4,-2.4"];
+
+    B1[pos="2,-2.4"];
+    B2[pos="2,-0.8"];
+
+    A1->C;
+    C->B1;
+    B2->A2;
+    B1->A3;
+  }
+
+  {
+    node [shape=plaintext,width=0,height=0];
+
+    r3[label="E -> \"f\" F\l",pos="3.1,0"];
+    r5[label="F -> \"g\" G\l",pos="5,-1.5"];
+    r7[label="G -> \"h\" E\l",pos="7.1,0"];
+    r8[label="E -> \"e\"\l",pos="7,-6"];
+  }
+
+  subgraph cluster_legend {
+    Legend[shape=plaintext,pos="3.1,-4.7",label="Legend:\l"];
+    includes[pos="3.1,-5.1",shape=plaintext,label="includes\l",class="svg-text-emerald-600"];
+
+    left->right[style=dashed,arrowhead=vee,class="svg-color-emerald-600"];
+    left[pos="4,-5.1",label="",style=invis,width=0,height=0];
+    right[pos="5.3,-5.1",label="",style=invis,width=0.2,height=0];
+  }
+}
+```
+
+The $\bm{lookback}$ relation is a bit different from the others because it does not relate transitions to transitions.
+
+Unfortunately that means it doesn't have such a nice graphical representation to help illustrate it, but computing it will be very similar to computing $\bm{includes}$.
+
+We define $\bm{lookback}$ such that $(\rho, \Alpha \rightarrow \omega)\ \bm{lookback}\ (\sigma, \Alpha)$ if and only if all of following are true.
+
+```math
+\begin{align*}
+  &\sigma\xrightarrow{\omega}\rho\\
+  &\rho\xmapsto{\Alpha}
+\end{align*}
+```
+
+<Focus>
+Where $\Alpha$ is a non-terminal; $\rho$ and $\sigma$ are states; and $\omega$ is a sequence of tokens.
+</Focus>
+
+### The Digraph Algorithm
+
+To compute $Read$ and $Follow$ from their respective relations we need to make use of a graph algorithm referred to as `Digraph`.
+
+The way these two functions are defined, each *strongly connected component* of the relation graph converges to the same value for each vertex in the component, then the other components have dependencies on that value as if the whole component was a single vertex.
+
+<Info>
+In a directed graph a node's *strongly connected component*, or SCC, is composed of every other reachable node which can also reach the starting node.
+```dot title="Graph where each colour represents a different SCC"
+digraph Scc {
+  layout=neato;
+  node [shape=circle,fixedsize="shape",width=0.5,height=0.5];
+  edge [class="svg-color-gray-600"];
+
+  {
+    node [class="svg-stroke-red-500 svg-fill-body-background"];
+    a;
+    b;
+    c;
+  }
+  {
+    node [class="svg-stroke-green-500 svg-fill-body-background"];
+    e;
+    f;
+    g;
+    h;
+  }
+  {
+    node [class="svg-stroke-blue-500 svg-fill-body-background"];
+    d;
+  }
+
+  a->b;
+  b->c;
+  c->a;
+
+  c->e;
+  c->f;
+
+  e->f;
+  f->g;
+  g->h;
+  h->e;
+
+  a->d;
+}
+```
+</Info>
+
+The `Digraph` algorithm is a modified SCC traversal algorithm which computes a specific form of graph function as it does so. Namely one in the following form:
+
+```math
+\Lambda(\rho,\Alpha) = \lambda(\rho,\Alpha) \cup \bigcup \{ \Lambda(\sigma,\Beta)\,|\,(\rho,\Alpha)\ \Xi\ (\sigma,\Beta) \}
+```
+
+Where $\Lambda$ is what we are trying to compute, $\lambda$ is some function we know how to compute without the use of $\Lambda$, and $\Xi$ is a relation.
+
+```ruby
+# &f means that the argument is passed using the ruby block syntax
+# i.e. {}
+# For now this can be mostly ignored as we use it as if it was just
+# another hashmap from edges to some value.
+#
+# To facilitate this ruby allows you to pass in a hash as a block
+# argument using the & operator, and you invoke it using [] rather
+# than ().
+def digraph(relation, edges, &f)
+  stack = []
+  path = []
+  state = {}
+  result = {}
+
+  for starting_point in edges
+    # The outer loop starts an iteration with the next unvisited
+    # edge after the previous starting point has traversed all
+    # reachable nodes.
+    unless state.key?(starting_point)
+      stack.push(starting_point)
+      state[starting_point] = 0
+    end
+
+    until stack.empty?
+      edge = stack.pop
+
+      if state[edge] == 0
+        # Each edge is queued for processing exactly twice. Once when
+        # traversing downwards in this branch, doing the initial
+        # setup, then again in the other branch when ascending back
+        # up to propagate the computed values across the component.
+        #
+        # Thus the weird step of queueing the same element again
+        # immediately after popping it.
+        stack.push(edge)
+        path.push(edge)
+
+        state[edge] = path.length
+        result[edge] = f[edge]
+
+        for other in relation[edge]
+          unless state.key?(other)
+            state[other] = 0
+            stack.push(other)
+          end
+        end
+      else
+        for other in relation[edge]
+          state[edge] = [state[edge], state[other]].min
+          result[edge] = result[edge] + result[other]
+        end
+
+        # Given how state[edge] is assigned to the minimum of the the
+        # current node and its neighbours above, this check should
+        # only be true for the first node visited in each SCC.
+        if path[state[edge]] == edge
+          while true
+            popped = path.pop
+            # The state gets set to infinity here so that the edge
+            # is never considered for being a part of any other
+            # component later. Otherwise the trick with setting the
+            # minimum value from neighbours wouldn't work properly.
+            state[popped] = Float::Infinity
+
+            if popped == edge
+              break
+            else
+              result[popped] = result[edge]
+            end
+          end
+        end
+      end
+    end
+  end
+
+  return result
+end
+```
+
+<Note>
+The original formulation of this algorithm is considerably simpler but accomplishes that with an inner recursive function. I've unwound it here as that is generally the desired form and the transformation is non-trivial.
+</Note>
+
+### Computing LA
+
+The steps of the algorithm are as follows:
+
+1. Compute nullable non-terminals from the grammar
+2. Compute $DR$ for each transition from the `LR(0)` parser
+3. Compute the $\bm{reads}$ from the `LR(0)` parser
+4. Apply Digraph to $\bm{reads}$ and $DR$ to compute $Read$
+5. Compute $\bm{includes}$ and $\bm{lookback}$ from the `LR(0)` parser
+6. Apply Digraph to $\bm{includes}$ and $Read$ to compute $Follow$
+7. Union all of the follow sets for each reduction as defined by $\bm{lookback}$ to compute $LA$
+
+I will include explanations of some of the less obvious elements of the above however, rather than post the whole implementation with little discussion, I will direct you to the full example source in [lalr.rb](https://github.com/BenoitHiller/lr_examples/tree/main/lib/lr_examples/lalr.rb) for all of the remaining details.
+
+#### Nullable Non-terminals
+
+The process of computing the nullable non-terminals is obvious, but non-trivial. Here is an example of an algorithm to do so making use of something very similar to the digraph algorithm to recursively traverse the tree.
+
+There are certainly some clever tricks that can be used to cut this down.
+
+```ruby
+@nullable = Set.new
+
+# The set of non_terminals on the right hand side of each
+# production. As the algorithm proceeds we will prune the
+# nullable tokens as we find them until it the set is empty at
+# which point we know the production is nullable.
+production_dependencies = Hash.new { |h, k| h[k] = Set.new }
+
+# This is the inverse mapping for the initial value of
+# production_dependencies
+has_token = Hash.new { |h, k| h[k] = Set.new }
+
+# @production_tokens is a mapping from production_id to left
+# hand token
+for production, left in @production_tokens do
+  # production_items(production) is a helper function that gives
+  # the list of items for a given production id.
+  tokens = production_items(production).map { |item|
+    @items[item]
+  }.to_set
+
+  if tokens.empty?
+    @nullable.add(left)
+  else
+    if (tokens & terminals).empty?
+      production_dependencies[production] = tokens
+
+      for token in tokens do
+        has_token[token].add(production)
+      end
+    end
+  end
+end
+
+queue = @nullable.to_a
+
+# For each nullable token there must exist a parse tree with
+# that token at the root such that every node in the tree is
+# also a nullable token.
+#
+# The implication of that is that we can enumerate all such
+# tokens by iteratively computing all of the tokens that can
+# be generated with a tree of each depth. That is accomplished
+# here by processing them in FIFO order as we find them.
+until queue.empty?
+  token = queue.shift()
+
+  for production in has_token[token] do
+    left_token = @production_tokens[production]
+
+    unless @nullable.include?(left_token)
+      production_dependencies[production].delete(token)
+
+      if production_dependencies[production].empty?
+        @nullable.add(left_token)
+        queue.push(left_token)
+      end
+    end
+  end
+end
+```
+
+#### includes and lookback
+
+The $\bm{includes}$ and $\bm{lookback}$ are both computed by attempting to traverse the paths defined by the right hand side of productions, so it makes sense to compute both of them at the same time.
+
+```ruby
+@lookback_relation = Hash.new { |h, k| h[k] = Set.new }
+@includes_relation = Hash.new { |h, k| h[k] = Set.new }
+
+# Where @transitions is the mapping from Edge[state, token] to
+# the state resulting from following that edge.
+#
+# @non_terminal_transitions is that mapping but with all edges where
+# token is a terminal removed.
+for edge, _ in @non_terminal_transitions do
+  for production in @productions_for[edge.label] do
+    tokens = production_items(production).map { |item|
+      @items[item]
+    }
+    state = edge.from
+    included = Set.new
+
+    for token in tokens do
+      next_edge = Edge[state, token]
+      state = @transitions[next_edge]
+      if state.nil?
+        # if we don't find a transition for a given token along
+        # the path described by the production, then state will
+        # be nil here and that value will be available outside
+        # the loop as a flag indicating whether the path was
+        # found.
+        break
+      end
+
+      # If we find a path from the initial state, then the
+      # transitions which include the start state are those for
+      # the nullable non-terminals at the end of the path, and
+      # at most one non-nullable non-terminal that immediately
+      # proceeds those.
+      if @non_terminals.include?(token)
+        unless @nullable.include?(token)
+          included.clear
+        end
+
+        included.add(next_edge)
+      else
+        included.clear
+      end
+    end
+
+    unless state.nil?
+      @lookback_relation[Edge[state, production]].add(edge)
+      for other_edge in included do
+        @includes_relation[other_edge].add(edge)
+      end
+    end
+  end
+end
+```
+
+### Ambiguity
+
+Like with a `LR(0)` parser, a grammar is only considered to be in `LALR(1)` if the parser generated by the described algorithm is unambiguous.
+
+Thus the output needs to be checked to ensure that each edge only corresponds to a single action, either shift or reduce.
+
+Some additional checks can be performed during the steps which make use of the digraph algorithm to identify grammars which are not `LR` at all. See <Citation.Reference style="minimal" author="DeRemer and Pennello" /> for more details.
+
+<Bibliography />
+</CitationProvider>

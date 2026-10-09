@@ -111,7 +111,12 @@ const TableOfContents: React.FC<{ className?: string; entries: Toc; addReference
   }, [fullEntries]);
 
   return (
-    <div className={classNames('flex md:border-r border-gray-950/5 flex-col gap-2 w-[inherit]', className)}>
+    <div
+      className={classNames(
+        'flex md:border-r border-gray-950/5 flex-col gap-2 w-[inherit]',
+        className
+      )}
+    >
       <h3>Contents</h3>
       <CurrentIdContext value={currentId}>
         <Section entries={fullEntries} />

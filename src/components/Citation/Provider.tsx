@@ -70,8 +70,8 @@ function formatAuthor(input: string[]): string | undefined {
 
 type ReferenceSpecifier = { n: number } | { author: string };
 type ReferenceProps = ReferenceSpecifier & {
-  style?: "minimal" | "author",
-  details?: string
+  style?: 'minimal' | 'author';
+  details?: string;
 };
 
 const Reference: React.FC<ReferenceProps> = (props) => {
@@ -99,10 +99,10 @@ const Reference: React.FC<ReferenceProps> = (props) => {
 
   let refString = `${index}`;
   if (details) {
-    refString += `, ${details}`
+    refString += `, ${details}`;
   }
 
-  switch(style) {
+  switch (style) {
     case 'author':
       const { authorKey } = reference;
       return (

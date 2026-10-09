@@ -52,6 +52,7 @@ export default function Layout({
               <nav className="flex h-14 gap-4 items-center">
                 <HeaderNavLink href="/">Home</HeaderNavLink>
                 <HeaderNavLink href="/blog">Blog</HeaderNavLink>
+                <HeaderNavLink href="/parsing">Parsing</HeaderNavLink>
               </nav>
             </div>
           </header>

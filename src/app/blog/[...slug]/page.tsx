@@ -14,7 +14,7 @@ export const dynamicParams = false;
 const latinModernMath = localFont({
   variable: '--font-math',
   src: '../../../vendor/latinmodern-math-1959/otf/latinmodern-math.otf'
-})
+});
 
 async function generateStaticParams() {
   const paths = await blogDb.listFiles();
