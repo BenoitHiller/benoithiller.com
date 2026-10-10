@@ -1,6 +1,7 @@
 import PostList from '@/components/BlogPostList';
 import Card from '@/components/Card';
 import * as TwoColumns from '@/components/TwoColumns';
+import Link from 'next/link';
 import { H2 } from '@/components/BlogHeading';
 
 async function Page() {
@@ -22,6 +23,18 @@ async function Page() {
       </TwoColumns.Left>
       <TwoColumns.Right className="prose collapse-inside">
         <H2>Portfolio</H2>
+        <Card
+          title="LrExamples"
+          href="https://github.com/BenoitHiller/lr_examples"
+          tags="Ruby Compilers"
+        >
+          <p>A reference implementation of LR(0) and LALR(1) parser generators.</p>
+          <p>
+            This is intended for use in the articles on this site under{' '}
+            <Link href="/parsing">Parsing</Link> which are written as a reference for LR parser
+            generation.
+          </p>
+        </Card>
         <Card title="ReportPrint" href="https://github.com/BenoitHiller/report_print" tags="Ruby">
           <p>A hybrid between PrettyPrint and AwesomePrint/AmazingPrint.</p>
           <p>
