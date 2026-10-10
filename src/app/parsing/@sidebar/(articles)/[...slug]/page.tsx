@@ -5,13 +5,23 @@ import Navigation from '@/app/parsing/_components/Navigation';
 
 export const dynamicParams = false;
 
+const citationsEntry = {
+  value: 'References',
+  depth: 1,
+  id: 'citations'
+};
+
 const listPages = cache(async () => {
   return await Array.fromAsync(fs.glob('./*/page.mdx', { cwd: process.env.articlePath! }));
 });
 
 const getToc = cache(async (slug: string) => {
   const page = await import(`../../../(articles)/${slug}/page.mdx`);
-  return page.tableOfContents;
+  let tableOfContents = page.tableOfContents;
+  if (page.hasReferences) {
+    tableOfContents = [...tableOfContents, citationsEntry];
+  }
+  return tableOfContents;
 });
 
 async function generateStaticParams() {

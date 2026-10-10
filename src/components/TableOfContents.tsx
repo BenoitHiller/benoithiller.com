@@ -9,12 +9,6 @@ import debounce from 'lodash.debounce';
 
 const CurrentIdContext = createContext<string | null>(null);
 
-const citationsEntry: TocEntry = {
-  value: 'References',
-  depth: 1,
-  id: 'citations'
-};
-
 const Entry: React.FC<{ entry: TocEntry }> = ({ entry }) => {
   const { id, value, children } = entry;
   const currentId = useContext(CurrentIdContext);
@@ -49,14 +43,9 @@ const Section: React.FC<{ entries?: Toc }> = ({ entries }) => {
 
 const TableOfContents: React.FC<{ className?: string; addReferences?: boolean; entries: Toc }> = ({
   className,
-  addReferences,
   entries
 }) => {
   const [currentId, setCurrentId] = useState<string | null>(null);
-  const fullEntries = useMemo(
-    () => (addReferences ? [...entries, citationsEntry] : entries),
-    [entries, addReferences]
-  );
 
   // I'm using a scroll and resize handler her in place of an
   // IntersectionObserver because sadly that would require me to transform the
@@ -107,13 +96,13 @@ const TableOfContents: React.FC<{ className?: string; addReferences?: boolean; e
       window.removeEventListener('resize', debouncedUpdate);
       debouncedUpdate.cancel();
     };
-  }, [fullEntries]);
+  }, [entries]);
 
   return (
     <div className={classNames('flex flex-col gap-2', className)}>
       <h3>Contents</h3>
       <CurrentIdContext value={currentId}>
-        <Section entries={fullEntries} />
+        <Section entries={entries} />
       </CurrentIdContext>
     </div>
   );
