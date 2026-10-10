@@ -8,16 +8,18 @@ const Table: React.FC<React.ComponentPropsWithoutRef<'table'> & { align?: 'left'
   align,
   ...props
 }) => (
-  <table
-    className={classNames(
-      'border-collapse',
-      'border',
-      'border-gray-400',
-      className,
-      `text-${align ?? 'right'}`
-    )}
-    {...props}
-  />
+  <div className="max-md:overflow-scroll prose-spacing">
+    <table
+      className={classNames(
+        'border-collapse',
+        'border',
+        'border-gray-400',
+        className,
+        `text-${align ?? 'right'}`
+      )}
+      {...props}
+    />
+  </div>
 );
 const THead: React.FC<React.ComponentPropsWithoutRef<'thead'>> = (props) => (
   <thead className="bg-slate-100" {...props} />
