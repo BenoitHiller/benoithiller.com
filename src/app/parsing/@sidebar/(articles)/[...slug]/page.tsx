@@ -25,7 +25,6 @@ async function generateStaticParams() {
 async function Page(props: PageProps<'/parsing/[...slug]'>) {
   const { slug } = await props.params;
   const tableOfContents = await getToc(slug.join('/'));
-  console.log(slug);
 
   return (
     <>
