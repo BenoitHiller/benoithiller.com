@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:ci": "pnpm prepare:ruby && pnpm build",
+    "prepare:ruby": "cd ./src/app/parsing/_lr_examples && bundle install",
     "start": "next start",
     "serve": "serve out",
     "lint": "eslint",
