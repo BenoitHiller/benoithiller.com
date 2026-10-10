@@ -139,7 +139,7 @@ interface DigitalManualProps {
 }
 
 interface SoftwareProps {
-  type: 'softwre';
+  type: 'software';
   version?: string;
   publisher?: string;
   accessed?: string;

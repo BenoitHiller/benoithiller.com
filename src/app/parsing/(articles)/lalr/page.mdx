@@ -2,6 +2,7 @@ import { Info, Note, Warning, Focus } from '@/components/Info';
 import * as Citation from '@/components/Citation';
 import * as Table from '@/components/DataTable';
 import { Bibliography, CitationProvider } from '@/components/Citation';
+import ExampleCode from '@/app/parsing/_components/ExampleCode';
 
 export const metadata = {
   title: 'Parsing 3: LALR(1)'
@@ -413,85 +414,7 @@ The `Digraph` algorithm is a modified SCC traversal algorithm which computes a s
 
 Where $\Lambda$ is what we are trying to compute, $\lambda$ is some function we know how to compute without the use of $\Lambda$, and $\Xi$ is a relation.
 
-```ruby
-# &f means that the argument is passed using the ruby block syntax
-# i.e. {}
-# For now this can be mostly ignored as we use it as if it was just
-# another hashmap from edges to some value.
-#
-# To facilitate this ruby allows you to pass in a hash as a block
-# argument using the & operator, and you invoke it using [] rather
-# than ().
-def digraph(relation, edges, &f)
-  stack = []
-  path = []
-  state = {}
-  result = {}
-
-  for starting_point in edges
-    # The outer loop starts an iteration with the next unvisited
-    # edge after the previous starting point has traversed all
-    # reachable nodes.
-    unless state.key?(starting_point)
-      stack.push(starting_point)
-      state[starting_point] = 0
-    end
-
-    until stack.empty?
-      edge = stack.pop
-
-      if state[edge] == 0
-        # Each edge is queued for processing exactly twice. Once when
-        # traversing downwards in this branch, doing the initial
-        # setup, then again in the other branch when ascending back
-        # up to propagate the computed values across the component.
-        #
-        # Thus the weird step of queueing the same element again
-        # immediately after popping it.
-        stack.push(edge)
-        path.push(edge)
-
-        state[edge] = path.length
-        result[edge] = f[edge]
-
-        for other in relation[edge]
-          unless state.key?(other)
-            state[other] = 0
-            stack.push(other)
-          end
-        end
-      else
-        for other in relation[edge]
-          state[edge] = [state[edge], state[other]].min
-          result[edge] = result[edge] + result[other]
-        end
-
-        # Given how state[edge] is assigned to the minimum of the the
-        # current node and its neighbours above, this check should
-        # only be true for the first node visited in each SCC.
-        if path[state[edge]] == edge
-          while true
-            popped = path.pop
-            # The state gets set to infinity here so that the edge
-            # is never considered for being a part of any other
-            # component later. Otherwise the trick with setting the
-            # minimum value from neighbours wouldn't work properly.
-            state[popped] = Float::Infinity
-
-            if popped == edge
-              break
-            else
-              result[popped] = result[edge]
-            end
-          end
-        end
-      end
-    end
-  end
-
-  return result
-end
-```
+<ExampleCode identifier="LrExamples::Digraph#digraph" />
 
 <Note>
 The original formulation of this algorithm is considerably simpler but accomplishes that with an inner recursive function. I've unwound it here as that is generally the desired form and the transformation is non-trivial.
@@ -517,127 +440,11 @@ The process of computing the nullable non-terminals is obvious, but non-trivial.
 
 There are certainly some clever tricks that can be used to cut this down.
 
-```ruby
-@nullable = Set.new
-
-# The set of non_terminals on the right hand side of each
-# production. As the algorithm proceeds we will prune the
-# nullable tokens as we find them until it the set is empty at
-# which point we know the production is nullable.
-production_dependencies = Hash.new { |h, k| h[k] = Set.new }
-
-# This is the inverse mapping for the initial value of
-# production_dependencies
-has_token = Hash.new { |h, k| h[k] = Set.new }
-
-# @production_tokens is a mapping from production_id to left
-# hand token
-for production, left in @production_tokens do
-  # production_items(production) is a helper function that gives
-  # the list of items for a given production id.
-  tokens = production_items(production).map { |item|
-    @items[item]
-  }.to_set
-
-  if tokens.empty?
-    @nullable.add(left)
-  else
-    if (tokens & terminals).empty?
-      production_dependencies[production] = tokens
-
-      for token in tokens do
-        has_token[token].add(production)
-      end
-    end
-  end
-end
-
-queue = @nullable.to_a
-
-# For each nullable token there must exist a parse tree with
-# that token at the root such that every node in the tree is
-# also a nullable token.
-#
-# The implication of that is that we can enumerate all such
-# tokens by iteratively computing all of the tokens that can
-# be generated with a tree of each depth. That is accomplished
-# here by processing them in FIFO order as we find them.
-until queue.empty?
-  token = queue.shift()
-
-  for production in has_token[token] do
-    left_token = @production_tokens[production]
-
-    unless @nullable.include?(left_token)
-      production_dependencies[production].delete(token)
-
-      if production_dependencies[production].empty?
-        @nullable.add(left_token)
-        queue.push(left_token)
-      end
-    end
-  end
-end
-```
+<ExampleCode identifier="LrExamples::Lr0#nullable_tokens" />
 
 #### includes and lookback
 
-The $\bm{includes}$ and $\bm{lookback}$ are both computed by attempting to traverse the paths defined by the right hand side of productions, so it makes sense to compute both of them at the same time.
-
-```ruby
-@lookback_relation = Hash.new { |h, k| h[k] = Set.new }
-@includes_relation = Hash.new { |h, k| h[k] = Set.new }
-
-# Where @transitions is the mapping from Edge[state, token] to
-# the state resulting from following that edge.
-#
-# @non_terminal_transitions is that mapping but with all edges where
-# token is a terminal removed.
-for edge, _ in @non_terminal_transitions do
-  for production in @productions_for[edge.label] do
-    tokens = production_items(production).map { |item|
-      @items[item]
-    }
-    state = edge.from
-    included = Set.new
-
-    for token in tokens do
-      next_edge = Edge[state, token]
-      state = @transitions[next_edge]
-      if state.nil?
-        # if we don't find a transition for a given token along
-        # the path described by the production, then state will
-        # be nil here and that value will be available outside
-        # the loop as a flag indicating whether the path was
-        # found.
-        break
-      end
-
-      # If we find a path from the initial state, then the
-      # transitions which include the start state are those for
-      # the nullable non-terminals at the end of the path, and
-      # at most one non-nullable non-terminal that immediately
-      # proceeds those.
-      if @non_terminals.include?(token)
-        unless @nullable.include?(token)
-          included.clear
-        end
-
-        included.add(next_edge)
-      else
-        included.clear
-      end
-    end
-
-    unless state.nil?
-      @lookback_relation[Edge[state, production]].add(edge)
-      for other_edge in included do
-        @includes_relation[other_edge].add(edge)
-      end
-    end
-  end
-end
-```
+<ExampleCode identifier="LrExamples::Lalr#compute_path_relations" />
 
 ### Ambiguity
 

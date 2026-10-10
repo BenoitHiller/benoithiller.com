@@ -140,6 +140,16 @@ const CodeBox: React.FC<{ children: React.ReactNode; meta: CodeMeta }> = ({
   );
 };
 
+const CodeComponent: React.FC<{ meta?: CodeMeta; code: string; lang: string }> = ({
+  meta = {},
+  code,
+  lang
+}) => (
+  <CodeBox meta={meta}>
+    <Code lang={lang} code={code} />
+  </CodeBox>
+);
+
 const CodeWrapper: React.FC<{ children: React.ReactNode } & CodeMeta> = (props) => {
   const { children, ...rest } = props;
   const parsed = parseChildren(children);
@@ -150,12 +160,10 @@ const CodeWrapper: React.FC<{ children: React.ReactNode } & CodeMeta> = (props) 
     const Component = codeOverrides[lang];
     return <Component meta={rest}>{code}</Component>;
   } else {
-    return (
-      <CodeBox meta={rest}>
-        <Code lang={lang} code={code} />
-      </CodeBox>
-    );
+    return <CodeComponent meta={rest} lang={lang} code={code} />;
   }
 };
+
+export { CodeComponent };
 
 export default CodeWrapper;

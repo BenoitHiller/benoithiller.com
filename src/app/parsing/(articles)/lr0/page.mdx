@@ -2,6 +2,7 @@ import { Info, Note, Warning, Focus } from '@/components/Info';
 import * as Citation from '@/components/Citation';
 import * as Table from '@/components/DataTable';
 import { Bibliography, CitationProvider } from '@/components/Citation';
+import ExampleCode from '@/app/parsing/_components/ExampleCode';
 
 export const metadata = {
   title: 'Parsing 2: LR(0)'
@@ -243,115 +244,16 @@ To compute these things in our code we are going to to make use of our item ids 
 
 #### Example Code
 
-```ruby
-def successors(item_set)
-  shifted_items = item_set.select { |item|
-    # For each item that isn't the last item in its production.
-    @items[item] > 0
-  }.map { |item|
-    # Generate a shifted item
-    item + 1
-  }
-
-  return shifted_items.group_by { |item|
-    # Now we group the shifted items we generated based on the
-    # id of the token that was shifted.
-    @items[item - 1]
-
-    # Then this converts the lists of grouped items into sets
-  }.transform_values { |array| array.to_set }
-end
-
-def closure(item_set)
-  result = item_set.dup
-  queue = item_set.to_a
-
-  until queue.empty?
-    i = queue.shift
-
-    token = @items[i]
-
-    # If the next token for the current item is a non-terminal
-    if token > @terminals_count
-      # Where @productions_for is assumed to map from token ids to
-      # the set of production ids which have that token as their
-      # left hand side.
-      token_items = @productions_for[token].map { |production|
-        @initial_items[production]
-      }.to_set
-
-      new_items = token_items - result
-
-      queue += new_items.to_a
-      result += new_items
-    end
-  end
-
-  return result
-end
-```
+<ExampleCode identifier="LrExamples::Lr0#successors" />
+<ExampleCode identifier="LrExamples::Lr0#closure" />
 
 ### Computing Parse Tables
 
 Finally we can put these tools together to compute the `LR(0)` parse tables and their associated $Next$ and $Reduce_0$ values.
 
-Following the $Next$/$Reduce_0$ convention the parse tables will be stored in `@f` as a mapping from state id to item set. `@f_inverse` will contain the mapping in the other direction.
+The following code populates `@table_states` with a mapping from item set to state id. The inverse mapping is available as `@table_states.inverted`.
 
-```ruby
-# The item set for state 0 is initialized to be the closure of
-# item 0, the start item.
-@f = [closure(Set[0])]
-@f_inverse = { @f[0] => 0 }
-
-# Initialize @next to a hash that initializes any missing keys to
-# a new nested hash when you attempt to access them.
-@next = Hash.new { |h, k| h[k] = {} }
-
-i = 0
-while i < @f.length
-  table = @f[i]
-
-  for token, new_table in successors(table)
-    # Skip generating the table that would shift the eof token, as
-    # we accept the input instead of visiting that state.
-    if token == 0
-      next
-    end
-
-    new_table = closure(new_table)
-
-    # The only terribly smart thing we have to do in this whole
-    # process is checking to see if the generated item set already
-    # exists, and if so simply put in a @next entry pointing to it.
-    if @f_inverse.key?(new_table)
-      @next[i][token] = @f_inverse[new_table]
-    else
-      id = @tables.length
-      @f_inverse[new_table] = id
-      @f[id] = new_table
-      @next[i][token] = id
-    end
-  end
-
-  i += 1
-end
-
-# Initialize @reduce to a hash that initializes any missing keys to
-# an empty set when you attempt to access them.
-@reduce = Hash.new { |h, k| h[k] = Set.new }
-
-for table, i in @f.each_with_index
-  for item in table
-    token = @items[item]
-    # This is where putting the -production ids in the @items array
-    # starts to pay off. We can find all of the items that result in
-    # a reduction in a state just by looking for the negative tokens
-    if token < 0
-      @reduce[i].add(-token)
-    end
-  end
-end
-```
+<ExampleCode identifier="LrExamples::Lr0#build_table_states!" />
 
 ### What This Looks Like
 
