@@ -16,7 +16,7 @@ const codeOverrides: { [key: string]: React.FC<{ children: string; meta: CodeMet
 };
 
 interface CodeMeta {
-  title?: string;
+  title?: React.ReactNode;
 }
 
 interface ParsedCode {
@@ -121,11 +121,11 @@ const CodeBox: React.FC<{ children: React.ReactNode; meta: CodeMeta }> = ({
       className={classNames(
         'expand-to-edge',
         {
-          'max-md:pt-6': !title,
-          'md:pt-8': !title
+          'max-md:pb-6': !title,
+          'md:pb-8': !title
         },
-        'max-md:pb-6',
-        'md:pb-8',
+        'max-md:pt-6',
+        'md:pt-8',
         'overflow-x-auto',
         'pr-8',
         'prose-spacing',
@@ -134,8 +134,8 @@ const CodeBox: React.FC<{ children: React.ReactNode; meta: CodeMeta }> = ({
         'font-mono'
       )}
     >
-      {title && <figcaption className="text-center text-ansi-gray pt-3">{title}</figcaption>}
       {children}
+      {title && <figcaption className="text-center text-ansi-gray pb-4">{title}</figcaption>}
     </figure>
   );
 };

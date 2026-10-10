@@ -6,7 +6,9 @@ import path from 'path';
 
 const exec = util.promisify(execFile);
 
-const scriptPath = path.resolve(process.env.articlePath!, '../_lr_examples/bin/source_of');
+const examplesPath = path.resolve(process.env.articlePath!, '../_lr_examples');
+const scriptPath = path.resolve(examplesPath, './bin/source_of');
+const exampleUrlBase = `${process.env.lrExamplesRepo!}/blob/main`;
 
 const getSource = cache(async (identifier: string) => {
   const { stdout } = await exec(scriptPath, [identifier]);
@@ -20,9 +22,16 @@ const getSource = cache(async (identifier: string) => {
 });
 
 const ExampleCode: React.FC<{ identifier: string }> = async ({ identifier }) => {
-  const { source } = await getSource(identifier);
+  const { sourceFile, line, source } = await getSource(identifier);
+  const filename = `${path.relative(examplesPath, sourceFile)}#L${line}`;
+  const sourceUrl = `${exampleUrlBase}/${filename}`;
+  const title = (
+    <a className="invisible-link" target="_blank" href={sourceUrl}>
+      {filename}
+    </a>
+  );
 
-  return <CodeComponent code={source} lang="ruby" />;
+  return <CodeComponent meta={{ title }} code={source} lang="ruby" />;
 };
 
 export default ExampleCode;

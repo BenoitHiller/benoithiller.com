@@ -27,7 +27,7 @@ const vizConfig: RenderOptions = {
   edgeAttributes: { fontsize: "18.0" }
 };
 
-const DotGraph: React.FC<{ children: string; meta: { title?: string } }> = ({
+const DotGraph: React.FC<{ children: string; meta: { title?: React.ReactNode } }> = ({
   children,
   meta: { title }
 }) => {

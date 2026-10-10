@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   env: {
     blogPath: path.resolve(__dirname, 'src/blog'),
     articlePath: path.resolve(__dirname, 'src/app/parsing/(articles)'),
+    lrExamplesRepo: 'https://github.com/BenoitHiller/lr_examples',
     rootPath,
     fallbackLocale: 'en-US',
     fallbackTimeZone: 'America/Toronto'
