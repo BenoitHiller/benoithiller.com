@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import classNames from 'classnames';
 import { usePathname } from 'next/navigation';
 
@@ -9,23 +8,23 @@ const NavItem: React.FC<{ href: string; children: React.ReactNode }> = ({ href, 
 
   return (
     <li>
-      <Link
+      <a
         className={classNames('inline-block text-base/8 text-gray-600 hover:text-gray-950', {
           'font-semibold': href == pathname
         })}
         href={href}
       >
         {children}
-      </Link>
+      </a>
     </li>
   );
 };
 
 const Navigation: React.FC = () => (
   <div className="flex flex-col gap-2">
-    <Link href="/parsing">
+    <a href="/parsing">
       <h3>Parsing</h3>
-    </Link>
+    </a>
     <ul className="flex flex-col pl-3">
       <NavItem href="/parsing/definitions">1. Definitions</NavItem>
       <NavItem href="/parsing/lr0">2. LR(0)</NavItem>

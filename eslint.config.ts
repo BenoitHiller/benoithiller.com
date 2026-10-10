@@ -9,7 +9,10 @@ const eslintConfig = defineConfig([
   prettierRecommended,
   {
     rules: {
-      'react/no-unescaped-entities': ['error', { forbid: ['>', '}'] }]
+      'react/no-unescaped-entities': ['error', { forbid: ['>', '}'] }],
+      // The Link component has extremely undesirable scroll behaviour, and given this is a static
+      // site it doesn't add much to justify that.
+      '@next/next/no-html-link-for-pages': 'off'
     }
   },
   globalIgnores([

@@ -2,7 +2,7 @@
 
 import type { Toc, TocEntry } from '@stefanprobst/rehype-extract-toc';
 import type React from 'react';
-import { useEffect, useState, useContext, createContext, useMemo, use } from 'react';
+import { useEffect, useState, useContext, createContext, useMemo } from 'react';
 import Link from 'next/link';
 import * as R from 'ramda';
 import classNames from 'classnames';
@@ -26,9 +26,9 @@ const Entry: React.FC<{ entry: TocEntry }> = ({ entry }) => {
 
   return (
     <li className="flex flex-col">
-      <Link className={className} href={`#${id}`}>
+      <a className={className} href={`#${id}`}>
         {value}
-      </Link>
+      </a>
       <Section entries={children} />
     </li>
   );

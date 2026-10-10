@@ -9,6 +9,11 @@ const listPages = cache(async () => {
   return await Array.fromAsync(fs.glob('./*/page.mdx', { cwd: process.env.articlePath! }));
 });
 
+const getToc = cache(async (slug: string) => {
+  const page = await import(`../../../(articles)/${slug}/page.mdx`);
+  return page.tableOfContents;
+});
+
 async function generateStaticParams() {
   const paths = await listPages();
 
@@ -19,12 +24,12 @@ async function generateStaticParams() {
 
 async function Page(props: PageProps<'/parsing/[...slug]'>) {
   const { slug } = await props.params;
-  const page = await import(`../../../(articles)/${slug.join('/')}/page.mdx`);
+  const tableOfContents = await getToc(slug.join('/'));
 
   return (
     <>
-      <TableOfContents addReferences entries={page.tableOfContents} />
       <Navigation />
+      <TableOfContents addReferences entries={tableOfContents} />
     </>
   );
 }
