@@ -432,7 +432,7 @@ The steps of the algorithm are as follows:
 6. Apply Digraph to $\bm{includes}$ and $Read$ to compute $Follow$
 7. Union all of the follow sets for each reduction as defined by $\bm{lookback}$ to compute $LA$
 
-I will include explanations of some of the less obvious elements of the above however, rather than post the whole implementation with little discussion, I will direct you to the full example source in [lalr.rb](https://github.com/BenoitHiller/lr_examples/tree/main/lib/lr_examples/lalr.rb) for all of the remaining details.
+I will include explanations of some of the less obvious elements of the above however, rather than post the whole implementation with little discussion, I will direct you to the full example source in [lalr.rb](https://github.com/BenoitHiller/lr_examples/blob/main/lib/lr_examples/lalr.rb) for all of the remaining details.
 
 #### Nullable Non-terminals
 
@@ -445,6 +445,18 @@ There are certainly some clever tricks that can be used to cut this down.
 #### includes and lookback
 
 <ExampleCode identifier="LrExamples::Lalr#compute_path_relations" />
+
+#### Using Digraph
+
+Once we've completed generating the relations, computing the $Read$ and $Follow$ functions is incredibly straightforward. Literally just filling in the arguments as described e.g.
+
+<ExampleCode identifier="LrExamples::Lalr#read" />
+
+#### Putting it all Together
+
+Then the final step of computing $LA$ is just merging everything together. In the code here this is combined with the step of generating the value of $Reduce_1$.
+
+<ExampleCode identifier="LrExamples::Lalr#reduce" />
 
 ### Ambiguity
 

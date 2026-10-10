@@ -6,6 +6,30 @@ import Card from '@/components/Card';
 <CitationProvider value={[
   {
     type: "article",
+    author: "D. E. Knuth",
+    title: "On the translation of languages from left to right",
+    journal: "Information and Control",
+    volume: 8,
+    number: 6,
+    year: "1965",
+    month: "Jun",
+    pages: "607-639",
+    doi: "https://doi.org/10.1016/S0019-9958(65)90426-2",
+  },
+  {
+    type: "article",
+    author: "T. Anderson, J. Eve, and J. J. Horning",
+    title: "Efficient LR (1) parsers",
+    journal: "Acta Informatica",
+    volume: 2,
+    number: 1,
+    year: "1973",
+    pages: "12-39",
+    doi: "https://doi.org/10.1007/bf00571461",
+    notes: "Article where the original LALR(1) algorithm is included, as CSRG-2 isn't available anywhere at this point."
+  },
+  {
+    type: "article",
     author: "F. DeRemer and T. Pennello",
     title: "Efficient Computation of LALR(1) Look-Ahead sets",
     journal: "ACM Transactions on Programming Languages and Systems",
@@ -17,6 +41,34 @@ import Card from '@/components/Card';
     doi: "https://doi.org/10.1145/69622.357187",
   },
   {
+    type: "book",
+    author: "A. V. Aho, M. S. Lam, Ravi Sethi, and J. D. Ullman",
+    title: "Compilers: Principles, Techniques, & Tools",
+    year: "2007",
+    publisher: "Pearson",
+    edition: "2nd",
+    city: "Boston",
+    state: "MA",
+    country: "USA"
+  },
+  {
+    type: "blog",
+    author: "D. R. Tribble",
+    title: "Practical LR(k) Parser Construction",
+    url: "http://david.tribble.com/text/lrk_parsing.html",
+    year: "2004",
+    month: "Dec",
+    day: "12"
+  },
+  {
+    type: "lecture-notes",
+    author: "J. Gregg",
+    title: "Shift-Reduce Parsers",
+    url: "https://www2.lawrence.edu/fast/GREGGJ/CMSC515/Parsing/LR.html",
+    year: "2021",
+    howpublished: "Online"
+  },
+  {
     type: "conference-proceedings",
     author: "J. E. Denny and B. A. Malloy",
     title: "IELR(1): practical LR(1) parser tables for non-LR(1) grammars with conflict resolution",
@@ -24,6 +76,13 @@ import Card from '@/components/Card';
     year: "2008",
     pages: "240-245",
     doi: "https://doi.org/10.1145/1363686.1363747"
+  },
+  {
+    type: "software",
+    title: "Bison, the GNU Compiler Compiler",
+    version: "v3.8.2",
+    publisher: "GNU Project",
+    url: "https://savannah.gnu.org/projects/bison"
   }
 ]}>
 
@@ -86,6 +145,28 @@ To build up even to `LALR(1)` however we need to lay some groundwork first. The 
 <Note>
 Each chapter does very much build on the ones before it. So if you ever find yourself wondering "but what does [term]" mean, either it is defined in a previous chapter or I've made a mistake and would be happy to receive a bug report about it.
 </Note>
+
+## Additional Reading
+
+Throughout the process of writing these I pulled a lot of general information from the following sources. They are well worth a read if you want to learn more.
+
+* _On the translation of languages from left to right_ by Donald E. Knuth <Reference style="minimal" author="D. E. Knuth" />.
+
+  The foundational paper on the topic.
+* _Efficient LR (1) Parsers_ by <Reference author="T. Anderson, J. Eve, and J. J. Horning" />.
+
+  This provides a great overview of everything known at the time about `LR` parsing, including being the earliest published source for `LALR`. As the original conference proceedings that proposed that algorithm are not widely available.
+* _Compilers: Principles, Techniques, & Tools_ by <Reference author="A. V. Aho, M. S. Lam, Ravi Sethi, and J. D. Ullman" />.
+
+  The "Purple Dragon" book. _The_ textbook on compilers.
+* [Practical LR(k) Parser Construction](http://david.tribble.com/text/lrk_parsing.html) by David R. Tribble <Reference style="minimal" author="D. R. Tribble" />.
+
+  A slightly incomplete article on the same topic. Works through examples in exceptional detail. Note that the Honalee Algorithm described here unfortunately has some flaws discussed in <Reference style="minimal" author="J. E. Denny and B. A. Malloy" />. It is very clean and simple compared to most alternatives, so this is a shame.
+* The [bison](https://savannah.gnu.org/projects/bison) parser generator.
+
+  If you are working through this yourself I highly recommend reviewing the generated parser states for various example grammars using a tool like `bison`.
+
+  The task of generating states for even a tiny parser is daunting for a human, and the states for such small examples are often too large to easily publish. Viewing those states provides essential context for most articles on the topic, my work included.
 
 <Bibliography />
 </CitationProvider>

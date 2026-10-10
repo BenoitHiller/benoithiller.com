@@ -25,11 +25,15 @@ async function generateStaticParams() {
 async function Page(props: PageProps<'/parsing/[...slug]'>) {
   const { slug } = await props.params;
   const tableOfContents = await getToc(slug.join('/'));
+  console.log(slug);
 
   return (
     <>
-      <Navigation />
-      <TableOfContents addReferences entries={tableOfContents} />
+      <div />
+      <div className="py-6 pr-2 h2-100%/14 fixed scrollbar-thin overflow-y-auto md:border-r border-gray-950/5 w-[inherit] flex flex-col gap-4">
+        <Navigation />
+        <TableOfContents addReferences entries={tableOfContents} />
+      </div>
     </>
   );
 }
