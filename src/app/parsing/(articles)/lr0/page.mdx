@@ -177,10 +177,11 @@ To avoid having to actually work with pairs in our algorithms we will use a conv
 i = 0
 @item_ids = {}
 @initial_items = {}
-for production in @productions
+@productions.each do |production|
   @initial_items[production.id] = i
 
-  for index in 0..production.length
+  # for each index from 0 to production.length - 1
+  production.length.times do |index|
     @item_ids[[production.id, index]] = i
     i += 1
   end

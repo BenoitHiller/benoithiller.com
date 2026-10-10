@@ -10,22 +10,6 @@ In each chapter I've generally tried to provide an explanation of every single c
 
 To get to the starting point where I can do that, I however need to lay out a few basic concepts.
 
-## Code Samples
-
-All of the code for this article is written in ruby so that it is runnable but also should be at least somewhat comprehensible to anyone who has written code.
-
-To make things easier to understand however I have tried to avoid ruby-isms that are overly difficult to translate into other languages. Though there are a number of cases where I will rely on merely providing a comment to explain what a method or feature does.
-
-<Info>
-Some helpful things to be aware of if you are less familiar with ruby:
-
-* The `?` character is allowed in method names
-* The function for checking if an item is in a collection is called `include?` instead of something like `contains`
-* Ruby allows the `()` to be omitted on method invocations. Here I have only done this on methods invoked without arguments.
-* Ruby allows `do`/`end` to be used in place of `{}` for defining closures.
-* Ruby generally uses the `each` method in place of a `for ... in` loop.
-</Info>
-
 ## Basic Definitions
 
 Parsing refers to the process of determining whether a string of symbols belongs to a given language. To define a language we will be using a *grammar*, which consists of a sequence of rules that define how to generate strings belonging to the language of that grammar.
@@ -224,3 +208,19 @@ A `LR(1)` parser is powerful enough to recognize most programming languages, whi
 Given these facts most `LR` parsers are of some variant that extends `LR(0)` slightly, such as `LALR` and `SLR` parsers.
 
 To describe how to build these more powerful parser variants I'm going to start with `LR(0)`, then describe techniques for taking those parsers and building more powerful parsers based on that foundation.
+
+## Code Samples
+
+All of the code for these articles is written in ruby so that it is runnable but also should be at least somewhat comprehensible to anyone who has written code.
+
+To make things easier to understand however I have tried to avoid ruby-isms that are overly difficult to translate into other languages. Though there are a number of cases where I will rely on merely providing a comment to explain what a method or feature does.
+
+<Info>
+Some helpful things to be aware of if you are less familiar with ruby:
+
+* The `?` and `!` characters are allowed in method names
+* The function for checking if an item is in a collection is called `include?` instead of something like `contains`
+* Ruby allows the `()` to be omitted on method invocations. Here I have only done this on methods invoked without arguments.
+* Ruby allows `do`/`end` to be used in place of `{}` for defining closures.
+* Ruby generally uses the `each` method in place of a `for ... in` loop.
+</Info>
