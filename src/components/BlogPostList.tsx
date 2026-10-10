@@ -13,7 +13,7 @@ const PostList = async () => {
           title={title ?? slug}
           subTitle={publishedAt && <Datestamp value={publishedAt} />}
           href={`/blog/${slug}`}
-          tags={draft ? "Draft" : undefined}
+          tags={draft ? 'Draft' : undefined}
         >
           {description}
         </Card>

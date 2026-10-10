@@ -36,9 +36,11 @@ const TR: React.FC<React.ComponentPropsWithoutRef<'tr'>> = ({ className, ...prop
 );
 
 const Caption: React.FC<React.ComponentPropsWithoutRef<'caption'>> = ({ className, ...props }) => (
-  <caption className={`p-3 bg-slate-100 border-x border-t border-gray-300 font-bold ${className}`} {...props} />
+  <caption
+    className={`p-3 bg-slate-100 border-x border-t border-gray-300 font-bold ${className}`}
+    {...props}
+  />
 );
-
 
 const Head: React.FC<{
   headings: (string | HeadingGroup)[];

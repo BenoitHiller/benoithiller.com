@@ -1,11 +1,9 @@
 import { cache } from 'react';
 import fs from 'fs/promises';
-import type { Dirent } from 'fs';
 import path from 'path';
 import type { Toc } from '@stefanprobst/rehype-extract-toc';
 import git from 'isomorphic-git';
 import * as R from 'ramda';
-import * as RA from 'ramda-adjunct';
 import type { Citation } from '@/components/Citation';
 
 /**
@@ -138,7 +136,9 @@ const list: () => Promise<BlogPost[]> = cache(async () => {
 
   const posts = await Promise.all(postPromises);
   return R.sort(
-    R.descend<BlogPost>(({ publishedAt, updatedAt }) => publishedAt?.valueOf() ?? updatedAt?.valueOf() ?? -Infinity),
+    R.descend<BlogPost>(
+      ({ publishedAt, updatedAt }) => publishedAt?.valueOf() ?? updatedAt?.valueOf() ?? -Infinity
+    ),
     posts
   );
 });

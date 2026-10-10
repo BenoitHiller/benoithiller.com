@@ -10,37 +10,6 @@ type CitationPlus = Citation & { authorKey: string[] };
 
 const CitationContext = React.createContext<CitationPlus[]>([]);
 
-class Name {
-  private readonly names: string[];
-
-  constructor(names: string[]) {
-    this.names = names;
-  }
-
-  last(): string {
-    return this.names[this.names.length - 1];
-  }
-
-  matchesLast(other: Name): boolean {
-    return this.last() == other.last();
-  }
-
-  static parse(input: string): Name {
-    return new Name(input.split(' '));
-  }
-
-  static parseList(input: string): Name[] {
-    const parts = input.split(/, |,? and /);
-    return parts.map(Name.parse);
-  }
-
-  static toRef(input: string): string {
-    return Name.parseList(input)
-      .map((item) => item.last().toLowerCase())
-      .join('-');
-  }
-}
-
 function getAuthorKey(input: string | undefined): string[] {
   if (!input) {
     return [];

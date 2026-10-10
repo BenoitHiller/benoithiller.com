@@ -3,7 +3,6 @@
 import type { Toc, TocEntry } from '@stefanprobst/rehype-extract-toc';
 import type React from 'react';
 import { useEffect, useState, useContext, createContext, useMemo } from 'react';
-import Link from 'next/link';
 import * as R from 'ramda';
 import classNames from 'classnames';
 import debounce from 'lodash.debounce';

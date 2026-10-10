@@ -22,9 +22,9 @@ function fixSizes(input: string): string {
 
 const vizConfig: RenderOptions = {
   format: 'svg_inline',
-  graphAttributes: { fontsize: "18.0", bgcolor: 'transparent' },
-  nodeAttributes: { fontsize: "18.0" },
-  edgeAttributes: { fontsize: "18.0" }
+  graphAttributes: { fontsize: '18.0', bgcolor: 'transparent' },
+  nodeAttributes: { fontsize: '18.0' },
+  edgeAttributes: { fontsize: '18.0' }
 };
 
 const DotGraph: React.FC<{ children: string; meta: { title?: React.ReactNode } }> = ({
